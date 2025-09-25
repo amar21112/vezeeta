@@ -34,3 +34,4 @@ Route::group(['prefix' => 'auth/doctor/' , 'namespace' => 'Auth'], function () {
     Route::get('register', [DoctorAuthController::class, 'showRegistrationForm'])->name('doctor.register');
     Route::post('register', [DoctorAuthController::class, 'register'])->name('doctor.register.submit');
 });
+
