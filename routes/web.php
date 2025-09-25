@@ -14,5 +14,29 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
+});
+
+Route::get('/login', function () {
+    return view('auth.login');
+});
+
+Route::get('/register', function () {
+    return view('auth.register');
+});
+
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+});
+
+Route::get('/doctors', function () {
+    return view('doctors');
+});
+
+Route::get('/doctor/{id}', function ($id) {
+    return view('doctor-profile', ['doctorId' => $id]);
+});
+
+Route::get('/create-reservation', function () {
+    return view('create-reservation');
 });
