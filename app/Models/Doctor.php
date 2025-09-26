@@ -11,9 +11,14 @@ class Doctor extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
     protected $guarded = [];
-
+    public $timestamps = false;
+    protected $hidden = [
+        'password',
+        'created_at',
+        'updated_at',
+    ];
     public function specialties()
     {
-        return $this->belongsToMany('App\Models\Specialty' , 'doctor_specialists', 'doctor_id', 'specialist_id');
+        return $this->belongsToMany('App\Models\Specialist' , 'doctor_specialists', 'doctor_id', 'specialist_id');
     }
 }

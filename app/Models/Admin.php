@@ -13,4 +13,10 @@ class Admin extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens;
     public $table = 'admin';
     protected $guarded = [];
+    protected $hidden = [
+        'password',
+        'created_at',
+        'updated_at',
+    ];
+    public $timestamps = false;
 }

@@ -60,6 +60,7 @@ class SpecialistController extends Controller
     public function destroy($id){
         $special = Specialist::where('id',$id)->first();
         if($special) {
+            $special->doctors()->detach();
             $special->delete();
             return redirect()->route('specialists.index')->with('success','Specialist deleted successfully');
         }else{

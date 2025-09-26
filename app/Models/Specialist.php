@@ -10,7 +10,11 @@ class Specialist extends Model
     use HasFactory;
     protected $table = 'specialists';
     protected $guarded = [];
-
+    public $timestamps = false;
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
     public function doctors()
     {
         return $this->belongsToMany('App\Models\Doctor' , 'doctor_specialists' ,'specialist_id' ,'doctor_id' );

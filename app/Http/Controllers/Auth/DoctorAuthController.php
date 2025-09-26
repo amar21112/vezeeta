@@ -48,9 +48,7 @@ class DoctorAuthController extends Controller
         Auth::guard('doctor')->login($doctor);
 
         // Return JSON response
-        return response()->json(['doctor' => $doctor]);
+        return redirect()->route('doctor.selectSpecialities');
     }
-
-
 
 }

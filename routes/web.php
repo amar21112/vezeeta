@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\DoctorAuthController;
+use App\Http\Controllers\Dashboard\DoctorController;
 use App\Http\Controllers\Dashboard\SpecialistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
@@ -77,4 +78,10 @@ Route::group(['prefix'=>'dashboard', 'middleware'=>'auth:admin'], function () {
    Route::post('speciality/update/{id}' , [SpecialistController::class , 'update'])->name('speciality.update');
 
    Route::get('speciality/delete/{id}' , [SpecialistController::class , 'destroy'])->name('speciality.delete');
+});
+
+Route::group(['prefix' => 'dashboard/doctor/', 'middleware'=>'auth:doctor'], function () {
+    route::get('profile' , [DoctorController::class , 'profile'])->name('doctor.profile');
+   route::get('select-specialities' , [DoctorController::class ,'addSpecialityForm'])->name('doctor.selectSpecialities');
+   route::post('store-speciality' , [DoctorController::class ,'storeSpeciality'])->name('doctor.specialities.store');
 });
