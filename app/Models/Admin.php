@@ -7,13 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-class Doctor extends Authenticatable
+
+class Admin extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
+    public $table = 'admin';
     protected $guarded = [];
-
-    public function specialties()
-    {
-        return $this->belongsToMany('App\Models\Specialty' , 'doctor_specialists', 'doctor_id', 'specialist_id');
-    }
 }

@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DoctorLoginRequest;
-use App\Http\Requests\DoctorRegestrationRequest;
+use App\Http\Requests\Auth\DoctorLoginRequest;
+use App\Http\Requests\Auth\DoctorRegestrationRequest;
 use App\Models\Doctor;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 

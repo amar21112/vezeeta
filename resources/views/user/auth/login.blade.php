@@ -1,56 +1,25 @@
+@extends('layouts.app')
+@section('title', 'Login')
+@section('content')
+    <?php include_once 'assets/css/auth.php'; ?>
+    <div class="container flex justify-center items-center min-h-screen bg-gray-100">
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
+        <div class="login-container">
+            <h2 class="text-2xl font-bold">Login</h2>
+            <form>
+                <input type="text" placeholder="Mobile number or email" required>
+                <input type="password" placeholder="Password" required>
 
-                <h3 class="mb-4 text-center">Login</h3>
+                <div class="remember-me">
+                    <input id="remember" type="checkbox">
+                    <label for="remember">
+                        Remember me
+                    </label>
+                </div>
 
-                {{-- Display validation errors --}}
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('user.login.submit') }}">
-                    @csrf
-
-                    {{-- Phone --}}
-                    <div class="form-group mb-3">
-                        <label for="phone">Phone</label>
-                        <input type="text"
-                               name="phone"
-                               id="phone"
-                               class="form-control @error('phone') is-invalid @enderror"
-                               value="{{ old('phone') }}"
-                               required
-                               autofocus
-                               placeholder="Enter your phone number">
-                    </div>
-
-                    {{-- Password --}}
-                    <div class="form-group mb-3">
-                        <label for="password">Password</label>
-                        <input type="password"
-                               name="password"
-                               id="password"
-                               class="form-control @error('password') is-invalid @enderror"
-                               required
-                               placeholder="Enter your password">
-                    </div>
-
-                    {{-- Submit --}}
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            Login
-                        </button>
-                    </div>
-
-                </form>
-            </div>
+                <button type="submit">Login</button>
+            </form>
+            <p><a href="register">Create a new account</a> | <a href="forgot-password">Forgot your password?</a></p>
         </div>
     </div>
+@endsection

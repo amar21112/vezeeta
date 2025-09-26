@@ -11,4 +11,8 @@ class Specialist extends Model
     protected $table = 'specialists';
     protected $guarded = [];
 
+    public function doctors()
+    {
+        return $this->belongsToMany('App\Models\Doctor' , 'doctor_specialists' ,'specialist_id' ,'doctor_id' );
+    }
 }

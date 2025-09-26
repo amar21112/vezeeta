@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
+use App\Http\Controllers\Controller;
 use App\Models\Specialist;
 use Illuminate\Http\Request;
 
@@ -14,19 +15,28 @@ class SpecialistController extends Controller
     }
 
     public function create(){
-        return view('specialist.create');
+        return view('dashboard.specialist.create');
     }
     public function store(Request $request){
         $validate = $request->validate([
             'special_name'=>'required|string|max:255|unique:specialists',
         ]);
         if($validate){
-            $specialist = Specialist::create($validate);
+            $data=[];
+            $data['special_name'] = strtolower($validate['special_name']);
+            $specialist = Specialist::create($data);
         }
 //        return redirect()->route('specialist.index')->with('success','Specialist created successfully');
         return $specialist;
     }
 
+    public function showUpdateForm($id){
+        $special = Specialist::where('id',$id)->first();
+        if($special){
+            return view('dashboard.specialist.update',compact('special'));
+        }
+        return redirect()->route('specialists.index');
+    }
     public function update(Request $request, $id){
 
         $special = Specialist::where('id',$id)->first();
@@ -37,21 +47,23 @@ class SpecialistController extends Controller
             ]);
 
             if($validate){
-                $special->update($validate);
+                $data=[];
+                $data['special_name'] = strtolower($validate['special_name']);
+                $special->update($data);
                 $special->save();
-                return redirect()->route('specialist.index')->with('success','Specialist updated successfully');
+                return redirect()->route('specialists.index')->with('success','Specialist updated successfully');
             }
-            return redirect()->route('specialist.index')->with('error','Specialist update failed');
+            return redirect()->route('specialists.index')->with('error','Specialist update failed');
         }
-        return redirect()->route('specialist.index')->with('error','Specialist not found');
+        return redirect()->route('specialists.index')->with('error','Specialist not found');
     }
     public function destroy($id){
         $special = Specialist::where('id',$id)->first();
         if($special) {
             $special->delete();
-            return redirect()->route('specialist.index')->with('success','Specialist deleted successfully');
+            return redirect()->route('specialists.index')->with('success','Specialist deleted successfully');
         }else{
-            return redirect()->route('specialist.index')->with('error','Specialist not found');
+            return redirect()->route('specialists.index')->with('error','Specialist not found');
         }
     }
 }

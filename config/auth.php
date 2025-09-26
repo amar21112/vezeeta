@@ -43,6 +43,10 @@ return [
         'doctor'=>[
             'driver' => 'session',
             'provider' => 'doctors',
+        ] ,
+        'admin' =>[
+            'driver' => 'session',
+            'provider' => 'admin',
         ]
     ],
 
@@ -71,6 +75,10 @@ return [
         'doctors'=>[
             'driver' => 'eloquent',
             'model' => App\Models\Doctor::class,
+        ],
+        'admin'=>[
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ]
         // 'users' => [
         //     'driver' => 'database',

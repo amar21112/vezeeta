@@ -81,14 +81,37 @@
                                   placeholder="Short bio or description">{{ old('about') }}</textarea>
                     </div>
 
-                    {{-- Address --}}
+                    {{-- Governorate --}}
+                    <select name="governorate" id="governorate"
+                            class="form-control @error('governorate') is-invalid @enderror" required>
+                        <option value="">-- select governorate --</option>
+                        @foreach(config('governorates') as $key => $val)
+                            <option value="{{ $key }}" {{ old('governorate') == $key ? 'selected' : '' }}>
+                                {{ $val }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- City --}}
                     <div class="form-group mb-3">
-                        <label for="address">Address</label>
-                        <input type="text" name="address" id="address"
-                               class="form-control @error('address') is-invalid @enderror"
-                               value="{{ old('address') }}" required maxlength="255"
-                               placeholder="Your full address">
+                        <label for="city">City</label>
+                        <input type="text" name="city" id="city"
+                               class="form-control @error('city') is-invalid @enderror"
+                               value="{{ old('city') }}" required maxlength="255"
+                               placeholder="Enter your city">
+                        @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+
+                    {{-- Street --}}
+                    <div class="form-group mb-3">
+                        <label for="street">Street</label>
+                        <input type="text" name="street" id="street"
+                               class="form-control @error('street') is-invalid @enderror"
+                               value="{{ old('street') }}" required maxlength="255"
+                               placeholder="Street name / number">
+                        @error('street')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
 
                     {{-- Password --}}
                     <div class="form-group mb-3">

@@ -2,7 +2,7 @@
 
 namespace App\Custome;
 
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\Auth\LoginRequest;
 
 class AuthService
 {

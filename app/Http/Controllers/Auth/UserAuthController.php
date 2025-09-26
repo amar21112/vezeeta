@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\UserRegestrationRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\UserRegestrationRequest;
 use App\Models\User;
 
 class UserAuthController extends Controller
