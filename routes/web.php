@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\DoctorAuthController;
 use App\Http\Controllers\Dashboard\DoctorController;
 use App\Http\Controllers\Dashboard\PatientController;
 use App\Http\Controllers\Dashboard\SpecialistController;
+use App\Http\Controllers\Site\MainController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
 /*
@@ -90,12 +91,18 @@ Route::group(['prefix' => 'dashboard/doctor/', 'middleware'=>'auth:doctor'], fun
    route::post('store-appointment' , [DoctorController::class ,'storeAppointment'])->name('doctor.appointments.store');
 });
 
+// user activity
 route::get('patient-appointments' ,[PatientController::class ,'patientAppointments'])
     ->name('patient.appointments')
     ->middleware('auth:sanctum');
 
-route::get('book' , [PatientController::class ,'bladeToPost']);
+route::get('book' , [PatientController::class ,'bladeToPost']); // not use just test you well send request to post method to book
+
 route::post('patient-book-appointment}' ,[PatientController::class ,'bookAppointment'])
     ->name('patient.book.appointment')
     ->middleware('auth:sanctum');
 
+Route::group(['prefix'=> 'vezeeta', 'namespace' => 'Site'], function () {
+    route::get('/' ,[MainController::class , 'index'])->name('vezeeta.index');
+    route::get('/show-doctor/{id}' ,[MainController::class , 'showDoctor'])->name('vezeeta.showDoctor');
+});

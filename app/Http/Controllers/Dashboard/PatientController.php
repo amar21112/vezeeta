@@ -10,7 +10,8 @@ class PatientController extends Controller
 {
     public function patientAppointments(){
         $patient = auth()->user();
-        $appointments = $patient->appointments;
+        $appointments = $patient->appointments->load('doctor');
+
         return $appointments;
     }
 
