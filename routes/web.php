@@ -19,9 +19,9 @@ use App\Http\Controllers\Auth\UserAuthController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-})->name('welcome');
+//Route::get('/', function () {
+//    return view('index');
+//})->name('welcome');
 
 Route::get('/register', function () {
     return view('auth.register');

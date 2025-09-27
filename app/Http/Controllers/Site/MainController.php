@@ -29,14 +29,12 @@ class MainController extends Controller
             'governorate' => [
                 'sometimes',
                 'string',
-                Rule::in(array_values(config('governorate')))
+                Rule::in(array_values(config('governorates')))
             ],
             'speciality'  => ['sometimes','integer','exists:specialists,id'],
         ]);
 
-        if(!$validated){
-            return redirect()->route('vezeeta.index');
-        }
+
         // Filter by governorate if it exists in the URL
         if ($request->filled('governorate')) {
 
