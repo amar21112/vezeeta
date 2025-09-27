@@ -24,13 +24,6 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-        'created_at',
-        'updated_at',
-    ];
-
     /**
      * The attributes that should be cast.
      *
@@ -40,4 +33,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function appointments(){
+        return $this->hasMany(Appointment::class);
+    }
+
 }

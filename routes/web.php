@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\DoctorAuthController;
 use App\Http\Controllers\Dashboard\DoctorController;
+use App\Http\Controllers\Dashboard\PatientController;
 use App\Http\Controllers\Dashboard\SpecialistController;
+use App\Http\Controllers\Site\MainController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
 /*
@@ -17,9 +19,9 @@ use App\Http\Controllers\Auth\UserAuthController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-})->name('welcome');
+//Route::get('/', function () {
+//    return view('index');
+//})->name('welcome');
 
 Route::get('/register', function () {
     return view('auth.register');
@@ -81,7 +83,26 @@ Route::group(['prefix'=>'dashboard', 'middleware'=>'auth:admin'], function () {
 });
 
 Route::group(['prefix' => 'dashboard/doctor/', 'middleware'=>'auth:doctor'], function () {
-    route::get('profile' , [DoctorController::class , 'profile'])->name('doctor.profile');
+   route::get('profile' , [DoctorController::class , 'profile'])->name('doctor.profile');
    route::get('select-specialities' , [DoctorController::class ,'addSpecialityForm'])->name('doctor.selectSpecialities');
    route::post('store-speciality' , [DoctorController::class ,'storeSpeciality'])->name('doctor.specialities.store');
+   route::get('appointments' , [DoctorController::class ,'doctorAppointments'])->name('doctor.appointments');
+   route::get('add-appointment' , [DoctorController::class ,'addAppointmentForm'])->name('doctor.appointments.add');
+   route::post('store-appointment' , [DoctorController::class ,'storeAppointment'])->name('doctor.appointments.store');
+});
+
+// user activity
+route::get('patient-appointments' ,[PatientController::class ,'patientAppointments'])
+    ->name('patient.appointments')
+    ->middleware('auth:sanctum');
+
+route::get('book' , [PatientController::class ,'bladeToPost']); // not use just test you well send request to post method to book
+
+route::post('patient-book-appointment}' ,[PatientController::class ,'bookAppointment'])
+    ->name('patient.book.appointment')
+    ->middleware('auth:sanctum');
+
+Route::group(['prefix'=> 'vezeeta', 'namespace' => 'Site'], function () {
+    route::get('/' ,[MainController::class , 'index'])->name('vezeeta.index');
+    route::get('/show-doctor/{id}' ,[MainController::class , 'showDoctor'])->name('vezeeta.showDoctor');
 });
