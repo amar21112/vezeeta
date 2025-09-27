@@ -1,5 +1,5 @@
 @php
-    $isLoggedIn = true;
+    $isLoggedIn = false;
 @endphp
 <!-- Enhanced Navbar with gradient background and shadow -->
 <nav class="bg-[#0073d1] text-white shadow-lg relative">
@@ -52,27 +52,28 @@
                     </div>
 
                     <!-- Enhanced Sign Up Button -->
-                    <a href="register"
-                        class="<?php if ($isLoggedIn) {
-                            echo 'hidden';
-                        } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
-                        <i class="fas fa-user-plus mr-2"></i>Sign Up
-                    </a>
+                    @unless (in_array(Route::currentRouteName(), ['user.login', 'user.register', 'user.forgot-password']))
+                        <a href="auth/register"
+                            class="<?php if ($isLoggedIn) {
+                                echo 'hidden';
+                            } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
+                            <i class="fas fa-user-plus mr-2"></i>Sign Up
+                        </a>
 
-                    <!-- Enhanced Navigation Links -->
-                    <a href="login"
-                        class="<?php if ($isLoggedIn) {
-                            echo 'hidden';
-                        } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Login
-                    </a>
-
-                    <a href="#"
+                        <!-- Enhanced Navigation Links -->
+                        <a href="auth/login"
+                            class="<?php if ($isLoggedIn) {
+                                echo 'hidden';
+                            } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </a>
+                    @endunless
+                    <a href="/doctors"
                         class="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
                         <i class="fas fa-stethoscope mr-2"></i>Vezeeta For Doctors
                     </a>
 
-                    <a href="#"
+                    <a href="https://wa.me/201005323460" target="_blank" rel="noopener"
                         class="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
                         <i class="fas fa-phone mr-2"></i>Contact Us
                     </a>
@@ -174,26 +175,28 @@
 
                 <!-- Mobile Navigation Links -->
                 <div class="flex flex-col space-y-1 px-6 pt-4">
-                    <a href="register"
-                        class="<?php if ($isLoggedIn) {
-                            echo 'hidden';
-                        } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
-                        <i class="fas fa-user-plus mr-3 w-5"></i>
-                        <span>Sign Up</span>
-                    </a>
-                    <a href="login"
-                        class="<?php if ($isLoggedIn) {
-                            echo 'hidden';
-                        } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
-                        <i class="fas fa-sign-in-alt mr-3 w-5"></i>
-                        <span>Login</span>
-                    </a>
-                    <a href="#"
+                    @unless (in_array(Route::currentRouteName(), ['user.login', 'user.register', 'user.forgot-password']))
+                        <a href="auth/register"
+                            class="<?php if ($isLoggedIn) {
+                                echo 'hidden';
+                            } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                            <i class="fas fa-user-plus mr-3 w-5"></i>
+                            <span>Sign Up</span>
+                        </a>
+                        <a href="auth/login"
+                            class="<?php if ($isLoggedIn) {
+                                echo 'hidden';
+                            } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                            <i class="fas fa-sign-in-alt mr-3 w-5"></i>
+                            <span>Login</span>
+                        </a>
+                    @endunless
+                    <a href="/doctors"
                         class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
                         <i class="fas fa-stethoscope mr-3 w-5"></i>
                         <span>Vezeeta For Doctors</span>
                     </a>
-                    <a href="#"
+                    <a href="https://wa.me/201005323460" target="_blank" rel="noopener"
                         class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
                         <i class="fas fa-phone mr-3 w-5"></i>
                         <span>Contact Us</span>

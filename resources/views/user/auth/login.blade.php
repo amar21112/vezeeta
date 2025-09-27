@@ -6,9 +6,23 @@
 
         <div class="login-container">
             <h2 class="text-2xl font-bold">Login</h2>
-            <form>
-                <input type="text" placeholder="Mobile number or email" required>
-                <input type="password" placeholder="Password" required>
+            {{-- Display validation errors --}}
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('user.login.submit') }}">
+                @csrf
+                <input type="text" placeholder="Mobile number" class="form-control @error('phone') is-invalid @enderror"
+                    value="{{ old('phone') }}" required>
+
+                <input type="password" placeholder="Password" class="form-control @error('password') is-invalid @enderror"
+                    required>
 
                 <div class="remember-me">
                     <input id="remember" type="checkbox">
