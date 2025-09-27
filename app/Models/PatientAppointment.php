@@ -10,4 +10,5 @@ class PatientAppointment extends Model
     use HasFactory;
     public $timestamps = false;
 
+    protected $table = 'patient_appointments';
 }

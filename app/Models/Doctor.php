@@ -21,4 +21,8 @@ class Doctor extends Authenticatable
     {
         return $this->belongsToMany('App\Models\Specialist' , 'doctor_specialists', 'doctor_id', 'specialist_id');
     }
+
+    public function appointments(){
+        return $this->hasMany('App\Models\Appointment', 'doctor_id', 'id');
+    }
 }

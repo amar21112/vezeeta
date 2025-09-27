@@ -6,9 +6,10 @@
 
         <div class="login-container">
             <h2 class="text-2xl font-bold">Login</h2>
-            <form>
-                <input type="text" placeholder="Mobile number or email" required>
-                <input type="password" placeholder="Password" required>
+            <form action="{{route('user.login.submit')}}" method="POST">
+                @csrf
+                <input type="text" name="phone" placeholder="Mobile number or email" required>
+                <input type="password" name="password" placeholder="Password" required>
 
                 <div class="remember-me">
                     <input id="remember" type="checkbox">
