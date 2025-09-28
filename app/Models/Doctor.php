@@ -11,11 +11,9 @@ class Doctor extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
     protected $guarded = [];
-    public $timestamps = false;
+    public $timestamps = true;
     protected $hidden = [
         'password',
-        'created_at',
-        'updated_at',
     ];
     public function specialties()
     {

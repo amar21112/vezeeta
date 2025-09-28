@@ -3,6 +3,8 @@
 
 @section('content')
 
+@include('components.alert')
+
 
 <div class="top-section overflow-hidden">
   <div class="main">

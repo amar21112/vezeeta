@@ -52,11 +52,11 @@ class MainController extends Controller
             'specialities' => Specialist::all(),
         ];
 
-        // For API response:
-        return $data;
-
         // For Blade page:
-        // return view('site.main.index', compact('data'));
+        return view('index', compact('data'));
+
+        // For API response:
+        // return $data;
     }
 
     public function showDoctor($id){

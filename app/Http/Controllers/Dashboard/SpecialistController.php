@@ -8,63 +8,68 @@ use Illuminate\Http\Request;
 
 class SpecialistController extends Controller
 {
-    public function index(){
-        $specialists = Specialist::all();
-//        return view('specialists.index', compact('specialists'));
-        return $specialists;
+    public function __construct()
+    {
+        $this->middleware('auth:admin');
+    }
+    
+    public function index(Request $request){
+        $query = Specialist::withCount('doctors');
+
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $query->where('special_name', 'LIKE', "%{$search}%");
+        }
+
+        $specialists = $query->orderBy('created_at', 'desc')->paginate(15);
+        
+        return view('admin.dashboard.specialists.index', compact('specialists'));
     }
 
     public function create(){
-        return view('dashboard.specialist.create');
+        return view('admin.dashboard.specialists.create');
     }
     public function store(Request $request){
-        $validate = $request->validate([
+        $request->validate([
             'special_name'=>'required|string|max:255|unique:specialists',
         ]);
-        if($validate){
-            $data=[];
-            $data['special_name'] = strtolower($validate['special_name']);
-            $specialist = Specialist::create($data);
-        }
-//        return redirect()->route('specialist.index')->with('success','Specialist created successfully');
-        return $specialist;
+        
+        Specialist::create([
+            'special_name' => ucwords($request->special_name)
+        ]);
+        
+        return redirect()->route('admin.specialists.index')->with('success','Specialist created successfully');
     }
 
     public function showUpdateForm($id){
-        $special = Specialist::where('id',$id)->first();
-        if($special){
-            return view('dashboard.specialist.update',compact('special'));
-        }
-        return redirect()->route('specialists.index');
+        $specialist = Specialist::findOrFail($id);
+        return view('admin.dashboard.specialists.edit', compact('specialist'));
     }
     public function update(Request $request, $id){
 
-        $special = Specialist::where('id',$id)->first();
-        if($special){
-
-            $validate = $request->validate([
-                'special_name'=>'required|string|max:255|unique:specialists,special_name,'.$special->id,
-            ]);
-
-            if($validate){
-                $data=[];
-                $data['special_name'] = strtolower($validate['special_name']);
-                $special->update($data);
-                $special->save();
-                return redirect()->route('specialists.index')->with('success','Specialist updated successfully');
-            }
-            return redirect()->route('specialists.index')->with('error','Specialist update failed');
-        }
-        return redirect()->route('specialists.index')->with('error','Specialist not found');
+        $specialist = Specialist::findOrFail($id);
+        
+        $request->validate([
+            'special_name'=>'required|string|max:255|unique:specialists,special_name,'.$specialist->id,
+        ]);
+        
+        $specialist->update([
+            'special_name' => ucwords($request->special_name)
+        ]);
+        
+        return redirect()->route('admin.specialists.index')->with('success','Specialist updated successfully');
     }
     public function destroy($id){
-        $special = Specialist::where('id',$id)->first();
-        if($special) {
-            $special->doctors()->detach();
-            $special->delete();
-            return redirect()->route('specialists.index')->with('success','Specialist deleted successfully');
-        }else{
-            return redirect()->route('specialists.index')->with('error','Specialist not found');
+        $specialist = Specialist::findOrFail($id);
+        
+        // Check if specialist has doctors
+        if($specialist->doctors()->count() > 0) {
+            return redirect()->route('admin.specialists.index')
+                ->with('error','Cannot delete specialist. It has associated doctors.');
         }
+        
+        $specialist->delete();
+        return redirect()->route('admin.specialists.index')
+            ->with('success','Specialist deleted successfully');
     }
 }

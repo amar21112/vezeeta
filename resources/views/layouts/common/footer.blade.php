@@ -84,7 +84,7 @@
           <p class="text-blue-100 text-sm mb-4">
             Join thousands of healthcare professionals on our platform
           </p>
-          <a href="#" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 rounded-lg transition-all duration-300 group">
+          <a href="{{ route('doctor.register') }}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 rounded-lg transition-all duration-300 group">
             <i class="fas fa-user-md text-white group-hover:scale-110 transition-transform"></i>
             <span class="text-white font-medium">Join Vezeeta Doctors</span>
             <i class="fas fa-arrow-right text-white group-hover:translate-x-1 transition-transform"></i>

@@ -9,15 +9,50 @@ use Illuminate\Http\Request;
 class   DoctorController extends Controller
 {
     public function profile(){
-        $doctor = auth('doctor')->user()->load('specialties');
+        $doctor = auth('doctor')->user()->load(['specialties', 'appointments']);
+        
+        // Calculate dashboard statistics - using availability to determine if appointment is booked
+        $totalPatients = $doctor->appointments()
+            ->where('availability', false)
+            ->count(); // Approximating unique patients
+            
+        $todayAppointments = $doctor->appointments()
+            ->whereDate('appointment_date', today())
+            ->where('availability', false)
+            ->count();
+            
+        $monthlyRevenue = $doctor->appointments()
+            ->whereMonth('appointment_date', now()->month)
+            ->whereYear('appointment_date', now()->year)
+            ->where('availability', false)
+            ->sum('price');
+            
+        $recentAppointments = $doctor->appointments()
+            ->where('availability', false)
+            ->orderBy('appointment_date', 'desc')
+            ->take(5)
+            ->get();
+            
+        $todayAppointmentsList = $doctor->appointments()
+            ->whereDate('appointment_date', today())
+            ->where('availability', false)
+            ->orderBy('appointment_date', 'asc')
+            ->get();
 
-//        return view('doctor.profile' , compact('doctor'));
-        return $doctor;
+        return view('doctor.dashboard.profile', compact(
+            'doctor', 
+            'totalPatients', 
+            'todayAppointments', 
+            'monthlyRevenue', 
+            'recentAppointments',
+            'todayAppointmentsList'
+        ));
     }
 
     public function addSpecialityForm(){
         $specialities = Specialist::all();
-        return view('dashboard.doctor.addSpeciality' ,compact('specialities'));
+        $doctor = auth('doctor')->user()->load('specialties');
+        return view('doctor.dashboard.specialities', compact('specialities', 'doctor'));
     }
 
     public function storeSpeciality(Request $request){
@@ -37,14 +72,32 @@ class   DoctorController extends Controller
 
     public function doctorAppointments(){
         $doctor = auth('doctor')->user();
-        $doctor = $doctor->load('appointments');
-        $doctor = $doctor->appointments->load('patient');
-        return $doctor;
-//        return view('dashboard.doctor.doctorAppointments',compact('doctorAppointments'));
+        $appointments = $doctor->appointments()->orderBy('appointment_date', 'desc')->get();
+        
+        // Calculate statistics - using availability to determine if appointment is booked
+        $availableSlots = $doctor->appointments()->where('availability', true)->count();
+        $bookedToday = $doctor->appointments()
+            ->whereDate('appointment_date', today())
+            ->where('availability', false)
+            ->count();
+        $thisWeekCount = $doctor->appointments()
+            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+        $totalRevenue = $doctor->appointments()
+            ->where('availability', false)
+            ->sum('price');
+        
+        return view('doctor.dashboard.appointments', compact(
+            'appointments', 
+            'availableSlots', 
+            'bookedToday', 
+            'thisWeekCount', 
+            'totalRevenue'
+        ));
     }
     public function addAppointmentForm()
     {
-       return view('dashboard.doctor.addAppointment');
+       return view('doctor.dashboard.add-appointment');
     }
     public function storeAppointment(Request $request){
         $doctor = auth('doctor')->user();

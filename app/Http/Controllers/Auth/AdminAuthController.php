@@ -11,26 +11,42 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    public function showLoginForm(){
+    public function showLoginForm()
+    {
+        // If admin is already authenticated, redirect to dashboard
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+        
         return view('admin.auth.login');
     }
     public function login(AdminLoginRequest $request)
     {
-      if(Auth('admin')->attempt($request->validated())){
-          $user = Auth('admin')->user();
-          return $user;
-      }
+        if (Auth('admin')->attempt($request->validated())) {
+            $request->session()->regenerate();
+            
+            return redirect()->intended(route('admin.dashboard'));
+        }
 
-      return redirect()->route('login');
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth('admin')->logout();
-        return redirect()->route('welcome');
+        return redirect()->route('index');
     }
 
 
-    public function showRegistrationForm(){
+    public function showRegistrationForm()
+    {
+        // If admin is already authenticated, redirect to dashboard
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+        
         return view('admin.auth.register');
     }
 
@@ -47,10 +63,7 @@ class AdminAuthController extends Controller
         // Log in using the admin guard
         Auth::guard('admin')->login($admin);
 
-        // Return JSON response
-        return response()->json(['admin' => $admin]);
+        // Redirect to admin dashboard with success message
+        return redirect()->route('admin.dashboard')->with('success', 'Welcome! Your admin account has been created successfully.');
     }
-
-
-
 }

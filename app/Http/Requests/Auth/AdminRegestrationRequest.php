@@ -23,8 +23,9 @@ class AdminRegestrationRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'phone' => 'required|numeric|digits:11|unique:admin',
-            'password' => 'required|string|min:6|confirmed',
+            'email' => 'required|string|email|max:255|unique:admins',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'required|string|min:8|confirmed',
         ];
     }
 }

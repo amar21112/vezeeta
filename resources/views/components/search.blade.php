@@ -1,3 +1,13 @@
+@php
+use App\Models\Specialist;
+
+// Get specialists from database
+$specialists = Specialist::orderBy('special_name')->get();
+
+// Get governorates from config
+$governorates = config('governorates');
+@endphp
+
 <div class="search-section">
   <div class="container">
     <div class="search-tabs">
@@ -15,31 +25,23 @@
       </div>
     </div>
 
-    <form class="search-bar" action="doctors" method="GET" id="searchForm">
+    <form class="search-bar" action="{{ route('doctors.search') }}" method="GET" id="searchForm">
       <div class="input-group">
         <i class="fas fa-stethoscope"></i>
         <select id="specialtySelect" name="specialty">
           <option value="" disabled selected>Select a specialty</option>
           <optgroup label="Most Popular">
-            <option value="dermatology">Dermatology</option>
-            <option value="psychiatry">Psychiatry</option>
-            <option value="pediatrics">Pediatrics</option>
-            <option value="neurology">Neurology</option>
-            <option value="orthopedics">Orthopedics</option>
-            <option value="gynaecology">Gynaecology</option>
-            <option value="ent">ENT</option>
-            <option value="cardiology">Cardiology and vascular disease</option>
+            @php
+            $popularSpecialties = ['Cardiology', 'Pediatrics', 'Dermatology', 'Orthopedics', 'Neurology', 'Gynecology', 'ENT (Ear, Nose, Throat)', 'Psychiatry'];
+            @endphp
+            @foreach($specialists->whereIn('special_name', $popularSpecialties) as $specialist)
+              <option value="{{ $specialist->special_name }}">{{ $specialist->special_name }}</option>
+            @endforeach
           </optgroup>
           <optgroup label="Other Specialties">
-            <option value="allergy">Allergy and Immunology (Sensitivity and Immunity)</option>
-            <option value="andrology">Andrology and Male Infertility</option>
-            <option value="audiology">Audiology</option>
-            <option value="cardiology_thoracic">Cardiology and Thoracic Surgery (Heart & Chest)</option>
-            <option value="chest_respiratory">Chest and Respiratory</option>
-            <option value="diabetes_endocrinology">Diabetes and Endocrinology</option>
-            <option value="diagnostic_radiology">Diagnostic Radiology (Scan Centers)</option>
-            <option value="dietitian_nutrition">Dietitian and Nutrition</option>
-            <option value="family_medicine">Family Medicine</option>
+            @foreach($specialists->whereNotIn('special_name', $popularSpecialties) as $specialist)
+              <option value="{{ $specialist->special_name }}">{{ $specialist->special_name }}</option>
+            @endforeach
           </optgroup>
         </select>
       </div>
@@ -65,16 +67,11 @@
             <option value="alexandria">Alexandria</option>
           </optgroup>
           <optgroup label="Other cities">
-            <option value="asyut">Asyut</option>
-            <option value="sohag">Sohag</option>
-            <option value="qena">Qena</option>
-            <option value="luxor">Luxor</option>
-            <option value="aswan">Aswan</option>
-            <option value="beni-suef">Beni Suef</option>
-            <option value="fayoum">Fayoum</option>
-            <option value="minya">Minya</option>
-            <option value="kafr-elsheikh">Kafr El-Sheikh</option>
-            <option value="damietta">Damietta</option>
+            @foreach($governorates as $key => $governorate)
+              @if(!in_array($key, ['cairo', 'giza', 'alexandria']))
+                <option value="{{ $key }}">{{ ucfirst(str_replace('_', ' ', $governorate)) }}</option>
+              @endif
+            @endforeach
           </optgroup>
         </select>
       </div>
@@ -241,7 +238,31 @@
     const areasByCity = {
       'cairo': ['Nasr City', 'Heliopolis', 'Maadi', 'Zamalek', 'Downtown', 'New Cairo', 'Rehab', 'Tagamoa'],
       'giza': ['Dokki', 'Mohandessin', 'Agouza', 'Haram', '6th October', 'Sheikh Zayed'],
-      'alexandria': ['Sidi Gaber', 'Stanley', 'Smouha', 'Montaza', 'Miami', 'Cleopatra']
+      'alexandria': ['Sidi Gaber', 'Stanley', 'Smouha', 'Montaza', 'Miami', 'Cleopatra'],
+      'assiut': ['Assiut City', 'New Assiut', 'Dayrout', 'Manfalout'],
+      'sohag': ['Sohag City', 'Akhmim', 'Girga', 'Balyana'],
+      'qena': ['Qena City', 'Qus', 'Nag Hammadi', 'Dishna'],
+      'luxor': ['Luxor City', 'Esna', 'Armant'],
+      'aswan': ['Aswan City', 'Kom Ombo', 'Edfu', 'Abu Simbel'],
+      'beni suef': ['Beni Suef City', 'New Beni Suef', 'Nasser', 'Ihnasia'],
+      'fayoum': ['Fayoum City', 'Tamiya', 'Sinnuris', 'Itsa'],
+      'minya': ['Minya City', 'New Minya', 'Mallawi', 'Samalout'],
+      'kafr el sheikh': ['Kafr El Sheikh City', 'Desuq', 'Fuwwah', 'Qallin'],
+      'damietta': ['Damietta City', 'New Damietta', 'Kafr Saad', 'Faraskur'],
+      'beheira': ['Damanhour', 'Kafr El Dawwar', 'Rashid', 'Edko'],
+      'dakahlia': ['Mansoura', 'Mit Ghamr', 'Talkha', 'Dekernes'],
+      'gharbia': ['Tanta', 'Mahalla El Kubra', 'Kafr El Zayat', 'Zefta'],
+      'ismailia': ['Ismailia City', 'Fayed', 'Qantara East', 'Abu Suwir'],
+      'monufia': ['Shibin El Kom', 'Menouf', 'Sadat City', 'Ashmoun'],
+      'qalyubia': ['Banha', 'Shubra El Kheima', 'Qaha', 'Kafr Shokr'],
+      'sharkia': ['Zagazig', 'Tenth of Ramadan', 'Bilbis', 'Faqous'],
+      'port said': ['Port Said City', 'Port Fouad'],
+      'suez': ['Suez City', 'Ain Sokhna', 'Faisal'],
+      'north sinai': ['Arish', 'Sheikh Zuweid', 'Bir al-Abd', 'Rafah'],
+      'south sinai': ['Sharm El Sheikh', 'Dahab', 'Nuweiba', 'Taba'],
+      'red sea': ['Hurghada', 'Safaga', 'Qusier', 'Marsa Alam'],
+      'new valley': ['Kharga', 'Dakhla', 'Farafra', 'Bahariya'],
+      'matrouh': ['Marsa Matrouh', 'El Alamein', 'Dabaa', 'Sallum']
     };
 
     citySelect.addEventListener('change', function() {

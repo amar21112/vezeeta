@@ -1,6 +1,3 @@
-@php
-    $isLoggedIn = false;
-@endphp
 <!-- Enhanced Navbar with gradient background and shadow -->
 <nav class="bg-[#0073d1] text-white shadow-lg relative">
     <!-- Enhanced Top notification bar -->
@@ -23,7 +20,7 @@
         <div class="flex items-center justify-between">
 
             <!-- Enhanced Logo with glow effect -->
-            <a href="/" class="flex items-center group">
+            <a href="{{ route('vezeeta.index') }}" class="flex items-center group">
                 <div class="relative">
                     <h2 class="text-3xl font-bold tracking-wide transition-all duration-300 group-hover:scale-105">
                         Vezeeta<span class="text-red-400 font-normal drop-shadow-sm">.com</span>
@@ -41,36 +38,248 @@
                 <!-- User Profile with avatar -->
                 <div class="flex items-center space-x-6 px-4">
                     <!-- User greeting with profile icon -->
-                    <div
-                        class="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm <?php if (!$isLoggedIn) {
-                            echo 'hidden';
-                        } ?>">
-                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-sm"></i>
+                    @auth
+                        <!-- User Profile Dropdown -->
+                        <div class="relative group">
+                            <button
+                                class="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+                                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium">{{ auth()->user()->name }}</span>
+                                <i
+                                    class="fas fa-chevron-down ml-2 text-xs group-hover:rotate-180 transition-transform duration-300"></i>
+                            </button>
+
+                            <!-- Dropdown menu -->
+                            <div
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                <div class="py-2">
+                                    <!-- User Info Header -->
+                                    <div class="px-4 py-3 border-b border-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-blue-600 text-sm"></i>
+                                            </div>
+                                            <div class="w-full">
+                                                <p class="text-sm font-medium text-ellipsis overflow-hidden text-gray-900">
+                                                    {{ auth()->user()->name }}</p>
+                                                <p class="text-xs text-ellipsis overflow-hidden text-gray-500">
+                                                    {{ auth()->user()->email }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dropdown Links -->
+                                    <a href="{{ route('dashboard.patient.index') }}"
+                                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300">
+                                        <i class="fas fa-tachometer-alt mr-3 w-5 text-blue-600"></i>
+                                        <span class="text-sm">Dashboard</span>
+                                    </a>
+
+                                    <a href="{{ route('patient.appointments') }}"
+                                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300">
+                                        <i class="fas fa-calendar-alt mr-3 w-5 text-blue-600"></i>
+                                        <span class="text-sm">My Appointments</span>
+                                    </a>
+
+                                    <div class="border-t border-gray-100 mt-2 pt-2">
+                                        <a href="{{ route('user.logout') }}"
+                                            class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-all duration-300">
+                                            <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                                            <span class="text-sm">Logout</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-sm font-medium">محمد مصطفى</span>
-                    </div>
+                    @endauth
 
-                    <!-- Enhanced Sign Up Button -->
-                    @unless (in_array(Route::currentRouteName(), ['user.login', 'user.register', 'user.forgot-password']))
-                        <a href="auth/register"
-                            class="<?php if ($isLoggedIn) {
-                                echo 'hidden';
-                            } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
-                            <i class="fas fa-user-plus mr-2"></i>Sign Up
-                        </a>
+                    @auth('doctor')
+                        <!-- Doctor Profile Dropdown -->
+                        <div class="relative group">
+                            <button
+                                class="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+                                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-md text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium">Dr. {{ auth('doctor')->user()->name }}</span>
+                                <i
+                                    class="fas fa-chevron-down ml-2 text-xs group-hover:rotate-180 transition-transform duration-300"></i>
+                            </button>
 
-                        <!-- Enhanced Navigation Links -->
-                        <a href="auth/login"
-                            class="<?php if ($isLoggedIn) {
-                                echo 'hidden';
-                            } ?> text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
-                            <i class="fas fa-sign-in-alt mr-2"></i>Login
-                        </a>
-                    @endunless
-                    <a href="/doctors"
+                            <!-- Doctor Dropdown menu -->
+                            <div
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                <div class="py-2">
+                                    <!-- Doctor Info Header -->
+                                    <div class="px-4 py-3 border-b border-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user-md text-green-600 text-sm"></i>
+                                            </div>
+                                            <div class="w-full">
+                                                <p class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden whitespace-nowrap">Dr.
+                                                    {{ auth('doctor')->user()->name }}</p>
+                                                <p class="text-xs text-gray-500 text-ellipsis overflow-hidden whitespace-nowrap">{{ auth('doctor')->user()->email }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Doctor Dropdown Links -->
+                                    <a href="{{ route('doctor.profile') }}"
+                                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 transition-all duration-300">
+                                        <i class="fas fa-tachometer-alt mr-3 w-5 text-green-600"></i>
+                                        <span class="text-sm">Dashboard</span>
+                                    </a>
+
+                                    <a href="{{ route('doctor.appointments') }}"
+                                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 transition-all duration-300">
+                                        <i class="fas fa-calendar-alt mr-3 w-5 text-green-600"></i>
+                                        <span class="text-sm">My Appointments</span>
+                                    </a>
+
+                                    <a href="{{ route('doctor.selectSpecialities') }}"
+                                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 transition-all duration-300">
+                                        <i class="fas fa-stethoscope mr-3 w-5 text-green-600"></i>
+                                        <span class="text-sm">Specialties</span>
+                                    </a>
+
+                                    <div class="border-t border-gray-100 mt-2 pt-2">
+                                        <a href="{{ route('doctor.logout') }}"
+                                            class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-all duration-300">
+                                            <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                                            <span class="text-sm">Logout</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endauth
+
+                    <!-- Enhanced Sign Up & Login Dropdown -->
+                    @guest('web')
+                        @guest('doctor')
+                            @unless (in_array(Route::currentRouteName(), [
+                                    'user.login',
+                                    'user.register',
+                                    'user.forgot-password',
+                                    'doctor.login',
+                                    'doctor.register',
+                                ]))
+                                <!-- Register Dropdown -->
+                                <div class="relative group">
+                                    <button
+                                        class="flex items-center space-x-2 text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
+                                        <i class="fas fa-user-plus mr-1"></i>
+                                        <span>Register</span>
+                                        <i
+                                            class="fas fa-chevron-down ml-1 text-xs group-hover:rotate-180 transition-transform duration-300"></i>
+                                    </button>
+
+                                    <!-- Register Dropdown Menu -->
+                                    <div
+                                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                        <div class="py-2">
+                                            <div class="px-4 py-2 border-b border-gray-100">
+                                                <p class="text-xs text-gray-500 font-medium">Choose Account Type</p>
+                                            </div>
+                                            <a href="{{ route('user.register') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-blue-200 transition-colors">
+                                                    <i class="fas fa-user text-blue-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Patient Account</p>
+                                                    <p class="text-xs text-gray-500">Book appointments & manage health</p>
+                                                </div>
+                                            </a>
+                                            <a href="{{ route('doctor.register') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-green-200 transition-colors">
+                                                    <i class="fas fa-user-md text-green-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Doctor Account</p>
+                                                    <p class="text-xs text-gray-500">Join our medical professionals</p>
+                                                </div>
+                                            </a>
+                                            <a href="{{ route('admin.register') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-purple-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-purple-200 transition-colors">
+                                                    <i class="fas fa-user-shield text-purple-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Admin Account</p>
+                                                    <p class="text-xs text-gray-500">System administration access</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Login Dropdown -->
+                                <div class="relative group">
+                                    <button
+                                        class="flex items-center space-x-2 text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
+                                        <i class="fas fa-sign-in-alt mr-1"></i>
+                                        <span>Login</span>
+                                        <i
+                                            class="fas fa-chevron-down ml-1 text-xs group-hover:rotate-180 transition-transform duration-300"></i>
+                                    </button>
+
+                                    <!-- Login Dropdown Menu -->
+                                    <div
+                                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                        <div class="py-2">
+                                            <div class="px-4 py-2 border-b border-gray-100">
+                                                <p class="text-xs text-gray-500 font-medium">Select Login Type</p>
+                                            </div>
+                                            <a href="{{ route('user.login') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-blue-200 transition-colors">
+                                                    <i class="fas fa-user text-blue-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Patient Login</p>
+                                                    <p class="text-xs text-gray-500">Access your health dashboard</p>
+                                                </div>
+                                            </a>
+                                            <a href="{{ route('doctor.login') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-green-200 transition-colors">
+                                                    <i class="fas fa-user-md text-green-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Doctor Login</p>
+                                                    <p class="text-xs text-gray-500">Access your practice dashboard</p>
+                                                </div>
+                                            </a>
+                                            <a href="{{ route('admin.login') }}"
+                                                class="flex items-center px-4 py-3 text-gray-700 hover:bg-purple-50 transition-all duration-300 group/item">
+                                                <div
+                                                    class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-purple-200 transition-colors">
+                                                    <i class="fas fa-user-shield text-purple-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Admin Login</p>
+                                                    <p class="text-xs text-gray-500">System administration panel</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endunless
+                        @endguest
+                    @endguest
+                    <a href="{{ route('doctor.register') }}"
                         class="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-white/10">
-                        <i class="fas fa-stethoscope mr-2"></i>Vezeeta For Doctors
+                        <i class="fas fa-stethoscope mr-2"></i>Join as Doctor
                     </a>
 
                     <a href="https://wa.me/201005323460" target="_blank" rel="noopener"
@@ -164,38 +373,154 @@
             id="mobile-menu">
             <div class="pt-6 pb-4">
                 <!-- Mobile User Profile -->
-                <div class="<?php if (!$isLoggedIn) {
-                    echo 'hidden';
-                } ?> flex items-center space-x-3 px-6 pb-4 border-b border-white/20">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-white"></i>
+                @auth
+                    <div class="px-6 pb-4 border-b border-white/20">
+                        <button
+                            class="w-full flex items-center justify-between text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300"
+                            onclick="toggleMobileDropdown('mobile-profile-dropdown')">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div class="text-left w-full">
+                                    <div class="text-white font-medium truncate text-ellipsis">{{ auth()->user()->name }}
+                                    </div>
+                                    <div class="text-white/70 text-xs text-ellipsis">{{ auth()->user()->email }}</div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs transition-transform duration-300"
+                                id="mobile-profile-chevron"></i>
+                        </button>
+
+                        <div class="hidden bg-white/10 rounded-lg mx-4 mt-1 overflow-hidden" id="mobile-profile-dropdown">
+                            <a href="{{ route('dashboard.patient.index') }}"
+                                class="flex items-center text-white py-3 px-4 hover:bg-white/10 transition-all duration-300">
+                                <i class="fas fa-tachometer-alt mr-3 w-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ route('patient.appointments') }}"
+                                class="flex items-center text-white py-3 px-4 hover:bg-white/10 transition-all duration-300">
+                                <i class="fas fa-calendar-alt mr-3 w-5"></i>
+                                <span>My Appointments</span>
+                            </a>
+                            <div class="border-t border-white/20 mt-2 pt-2">
+                                <a href="{{ route('user.logout') }}"
+                                    class="flex items-center text-white py-3 px-4 hover:bg-red-500/20 transition-all duration-300">
+                                    <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <span class="text-white font-medium">محمد مصطفى</span>
-                </div>
+                @endauth
+
+                @auth('doctor')
+                    <!-- Mobile Doctor Profile -->
+                    <div class="px-6 pt-4 border-b border-white/20 pb-4">
+                        <button
+                            class="w-full flex items-center justify-between text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300"
+                            onclick="toggleMobileDropdown('mobile-doctor-dropdown')">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-md text-white"></i>
+                                </div>
+                                <div class="text-left w-full">
+                                    <div class="text-white font-medium truncate text-ellipsis">Dr.
+                                        {{ auth('doctor')->user()->name }}
+                                    </div>
+                                    <div class="text-white/70 text-xs text-ellipsis">{{ auth('doctor')->user()->email }}
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs transition-transform duration-300"
+                                id="mobile-doctor-chevron"></i>
+                        </button>
+
+                        <div class="hidden bg-white/10 rounded-lg mx-4 mt-1 overflow-hidden" id="mobile-doctor-dropdown">
+                            <a href="{{ route('doctor.profile') }}"
+                                class="flex items-center text-white py-3 px-4 hover:bg-white/10 transition-all duration-300">
+                                <i class="fas fa-tachometer-alt mr-3 w-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ route('doctor.appointments') }}"
+                                class="flex items-center text-white py-3 px-4 hover:bg-white/10 transition-all duration-300">
+                                <i class="fas fa-calendar-alt mr-3 w-5"></i>
+                                <span>My Appointments</span>
+                            </a>
+                            <a href="{{ route('doctor.selectSpecialities') }}"
+                                class="flex items-center text-white py-3 px-4 hover:bg-white/10 transition-all duration-300">
+                                <i class="fas fa-stethoscope mr-3 w-5"></i>
+                                <span>Specialties</span>
+                            </a>
+                            <div class="border-t border-white/20 mt-2 pt-2">
+                                <a href="{{ route('doctor.logout') }}"
+                                    class="flex items-center text-white py-3 px-4 hover:bg-red-500/20 transition-all duration-300">
+                                    <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endauth
 
                 <!-- Mobile Navigation Links -->
                 <div class="flex flex-col space-y-1 px-6 pt-4">
-                    @unless (in_array(Route::currentRouteName(), ['user.login', 'user.register', 'user.forgot-password']))
-                        <a href="auth/register"
-                            class="<?php if ($isLoggedIn) {
-                                echo 'hidden';
-                            } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
-                            <i class="fas fa-user-plus mr-3 w-5"></i>
-                            <span>Sign Up</span>
-                        </a>
-                        <a href="auth/login"
-                            class="<?php if ($isLoggedIn) {
-                                echo 'hidden';
-                            } ?> flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
-                            <i class="fas fa-sign-in-alt mr-3 w-5"></i>
-                            <span>Login</span>
-                        </a>
-                    @endunless
-                    <a href="/doctors"
-                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
-                        <i class="fas fa-stethoscope mr-3 w-5"></i>
-                        <span>Vezeeta For Doctors</span>
-                    </a>
+                    @guest('web')
+                        @guest('doctor')
+                            @unless (in_array(Route::currentRouteName(), [
+                                    'user.login',
+                                    'user.register',
+                                    'user.forgot-password',
+                                    'doctor.login',
+                                    'doctor.register',
+                                ]))
+                                <!-- Mobile Patient Registration -->
+                                <div class="mb-2">
+                                    <h6 class="text-white/70 text-xs font-semibold px-4 pb-2">Patient Registration</h6>
+                                    <a href="{{ route('user.register') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-user-plus mr-3 w-5"></i>
+                                        <span>Sign Up as Patient</span>
+                                    </a>
+                                    <a href="{{ route('user.login') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-sign-in-alt mr-3 w-5"></i>
+                                        <span>Patient Login</span>
+                                    </a>
+                                </div>
+
+                                <!-- Mobile Doctor Registration -->
+                                <div class="mb-2 pt-3 border-t border-white/20">
+                                    <h6 class="text-white/70 text-xs font-semibold px-4 pb-2">Doctor Registration</h6>
+                                    <a href="{{ route('doctor.register') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-user-md mr-3 w-5"></i>
+                                        <span>Join as Doctor</span>
+                                    </a>
+                                    <a href="{{ route('doctor.login') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-stethoscope mr-3 w-5"></i>
+                                        <span>Doctor Login</span>
+                                    </a>
+                                </div>
+
+                                <!-- Mobile Admin Registration -->
+                                <div class="mb-2 pt-3 border-t border-white/20">
+                                    <h6 class="text-white/70 text-xs font-semibold px-4 pb-2">Admin Access</h6>
+                                    <a href="{{ route('admin.register') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-user-shield mr-3 w-5"></i>
+                                        <span>Admin Registration</span>
+                                    </a>
+                                    <a href="{{ route('admin.login') }}"
+                                        class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
+                                        <i class="fas fa-shield-alt mr-3 w-5"></i>
+                                        <span>Admin Login</span>
+                                    </a>
+                                </div>
+                            @endunless
+                        @endguest
+                    @endguest
                     <a href="https://wa.me/201005323460" target="_blank" rel="noopener"
                         class="flex items-center text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2">
                         <i class="fas fa-phone mr-3 w-5"></i>

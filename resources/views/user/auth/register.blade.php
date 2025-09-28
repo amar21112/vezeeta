@@ -5,15 +5,8 @@
     <div class="container flex justify-center items-center min-h-screen bg-gray-100">
         <div class="login-container">
             <h2 class="text-2xl font-bold">Create an Account</h2>
-            @if ($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    <ul class="list-disc pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            
+            @include('components.alert')
             <form method="POST" action="{{ route('user.register.submit') }}">
                 @csrf
                 <input type="text" placeholder="Full Name" class="form-control @error('name') is-invalid @enderror"
@@ -64,7 +57,7 @@
 
                 <button type="submit">Register</button>
             </form>
-            <p><a href="login">Already have an account? Log in</a></p>
+            <p><a href="{{ route('user.login') }}">Already have an account? Log in</a></p>
         </div>
 
     </div>

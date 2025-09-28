@@ -21,7 +21,18 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                // Redirect based on guard type
+                switch ($guard) {
+                    case 'admin':
+                        return redirect()->route('admin.dashboard');
+                    case 'doctor':
+                        return redirect()->route('doctor.profile');
+                    case 'user':
+                        return redirect()->route('dashboard.patient.index');
+                    case 'web':
+                    default:
+                        return redirect(RouteServiceProvider::HOME);
+                }
             }
         }
 

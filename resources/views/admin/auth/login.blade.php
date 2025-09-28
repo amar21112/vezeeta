@@ -1,56 +1,225 @@
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
+    @extends('layouts.app')
 
-                <h3 class="mb-4 text-center">Login</h3>
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-[#0073d1] via-[#0056b3] to-[#004085] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header Section -->
+        <div class="text-center">
+            <div class="mx-auto h-20 w-20 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-user-shield text-3xl text-white"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-2">Admin Login</h2>
+            <p class="text-blue-100 text-sm">Sign in to access the administration panel</p>
+        </div>
 
-                {{-- Display validation errors --}}
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+        <!-- Login Card -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+            <!-- Display validation errors -->
+            @if ($errors->any())
+                <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Authentication Error</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                @endif
+                </div>
+            @endif
 
-                <form method="POST" action="{{ route('admin.login.submit') }}">
-                    @csrf
+            <form method="POST" action="{{ route('admin.login.submit') }}" class="space-y-6">
+                @csrf
 
-                    {{-- Phone --}}
-                    <div class="form-group mb-3">
-                        <label for="phone">Phone</label>
-                        <input type="text"
-                               name="phone"
-                               id="phone"
-                               class="form-control @error('phone') is-invalid @enderror"
-                               value="{{ old('phone') }}"
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-blue-600"></i>Email Address
+                    </label>
+                    <div class="relative">
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 @error('email') border-red-500 @enderror"
+                               value="{{ old('email') }}"
                                required
                                autofocus
-                               placeholder="Enter your phone number">
+                               placeholder="admin@vezeeta.com">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
                     </div>
+                    @error('email')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    {{-- Password --}}
-                    <div class="form-group mb-3">
-                        <label for="password">Password</label>
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-blue-600"></i>Password
+                    </label>
+                    <div class="relative">
                         <input type="password"
                                name="password"
                                id="password"
-                               class="form-control @error('password') is-invalid @enderror"
+                               class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 @error('password') border-red-500 @enderror"
                                required
                                placeholder="Enter your password">
-                    </div>
-
-                    {{-- Submit --}}
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            Login
+                        <button type="button" 
+                                class="absolute inset-y-0 right-0 flex items-center pr-3"
+                                onclick="togglePassword('password')">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600 cursor-pointer" id="password-eye"></i>
                         </button>
                     </div>
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                </form>
+                <!-- Remember Me -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" 
+                               name="remember" 
+                               type="checkbox" 
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-sign-in-alt text-blue-300 group-hover:text-blue-200"></i>
+                        </span>
+                        Sign In to Admin Panel
+                    </button>
+                </div>
+
+                <!-- Alternative Actions -->
+                <div class="text-center pt-6 border-t border-gray-200">
+                    <p class="text-sm text-gray-600 mb-4">Don't have an admin account?</p>
+                    <a href="{{ route('admin.register') }}" 
+                       class="inline-flex items-center px-4 py-2 border border-blue-600 text-sm font-medium rounded-lg text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Create Admin Account
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="text-center">
+            <div class="flex justify-center space-x-6 text-blue-100">
+                <a href="{{ route('user.login') }}" class="hover:text-white transition-colors duration-200 text-sm">
+                    <i class="fas fa-user mr-1"></i>Patient Login
+                </a>
+                <a href="{{ route('doctor.login') }}" class="hover:text-white transition-colors duration-200 text-sm">
+                    <i class="fas fa-user-md mr-1"></i>Doctor Login
+                </a>
+                <a href="{{ route('home') }}" class="hover:text-white transition-colors duration-200 text-sm">
+                    <i class="fas fa-home mr-1"></i>Back to Home
+                </a>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Password Toggle Script -->
+<script>
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const eye = document.getElementById(fieldId + '-eye');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        eye.className = 'fas fa-eye-slash text-gray-400 hover:text-gray-600 cursor-pointer';
+    } else {
+        field.type = 'password';
+        eye.className = 'fas fa-eye text-gray-400 hover:text-gray-600 cursor-pointer';
+    }
+}
+
+// Add loading animation to submit button
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = `
+            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                <i class="fas fa-spinner fa-spin text-blue-300"></i>
+            </span>
+            Signing In...
+        `;
+        submitBtn.disabled = true;
+    });
+});
+</script>
+
+<style>
+/* Custom animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.max-w-md {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Enhanced form styling */
+.form-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(0, 115, 209, 0.1);
+}
+
+/* Gradient background animation */
+.bg-gradient-to-br {
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glass morphism effect */
+.backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Button hover effects */
+button:hover {
+    box-shadow: 0 10px 25px rgba(0, 115, 209, 0.3);
+}
+</style>
+@endsection

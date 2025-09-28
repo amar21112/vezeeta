@@ -16,8 +16,14 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $guarded = [];
-    public $timestamps = false;
+    protected $fillable = [
+        'name',
+        'email',
+        'phone', 
+        'birthday',
+        'password',
+    ];
+    public $timestamps = true;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -37,6 +43,10 @@ class User extends Authenticatable
 
     public function appointments(){
         return $this->hasMany(Appointment::class);
+    }
+
+    public function patientAppointments(){
+        return $this->hasMany(PatientAppointment::class, 'user_id');
     }
 
 }

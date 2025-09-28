@@ -17,16 +17,17 @@ class DoctorAuthController extends Controller
     public function login(DoctorLoginRequest $request)
     {
       if(Auth('doctor')->attempt($request->validated())){
-          $user = Auth('doctor')->user();
-          return $user;
+          return redirect()->route('doctor.profile');
       }
 
-      return redirect()->route('login');
+      return redirect()->back()->withErrors([
+          'phone' => 'Invalid credentials provided.',
+      ])->withInput();
     }
 
     public function logout(){
         Auth('doctor')->logout();
-        return redirect()->route('welcome');
+        return redirect()->route('home');
     }
 
 
