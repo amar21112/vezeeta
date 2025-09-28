@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\PatientAppointment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,9 +16,13 @@ class PatientController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $appointmentsCount = $user->appointments()->count();
-        $upcomingAppointments = $user->appointments()->where('appointment_date', '>=', now())->count();
-        // $completedAppointments = $user->appointments()->where('status', 'completed')->count();
+        $appointmentsCount = $user->patientAppointments()->count();
+        $upcomingAppointments = $user->patientAppointments()
+            ->whereHas('appointment', function($query) {
+                $query->where('date', '>=', now()->format('Y-m-d'));
+            })
+            ->count();
+        // $completedAppointments = $user->patientAppointments()->where('status', 'completed')->count();
 
         return view('dashboard.patient.index', compact('user', 'appointmentsCount', 'upcomingAppointments'));
     }
@@ -43,7 +48,7 @@ class PatientController extends Controller
         
         $user->update($validated);
         
-        return redirect()->route('dashboard.patient.index')
+        return redirect()->route('patient.dashboard')
                         ->with('success', 'Profile updated successfully!');
     }
 
@@ -51,7 +56,13 @@ class PatientController extends Controller
     public function appointments()
     {
         $user = auth()->user();
-        $appointments = $user->appointments()->with('doctor')->orderBy('appointment_date', 'desc')->get();
+        $appointments = $user->patientAppointments()
+            ->with(['doctor', 'appointment'])
+            ->join('appointments', 'patient_appointments.appointment_id', '=', 'appointments.id')
+            ->orderBy('appointments.date', 'desc')
+            ->orderBy('appointments.time', 'desc')
+            ->select('patient_appointments.*')
+            ->get();
         return view('dashboard.patient.appointments', compact('appointments'));
     }
 
@@ -74,11 +85,20 @@ class PatientController extends Controller
         $appointment = Appointment::find($request->appointment_id);
         $patient = auth()->user();
 
-        if ($appointment && $patient && $appointment->availability) {
-            $appointment->patient()->associate($patient);
-            $appointment->availability = false;
-            $appointment->status = 'booked';
-            $appointment->save();
+        if ($appointment && $patient && $appointment->status === 'available') {
+            // Create PatientAppointment record
+            PatientAppointment::create([
+                'user_id' => $patient->id,
+                'doctor_id' => $appointment->doctor_id,
+                'appointment_id' => $appointment->id,
+                'status' => 'pending',
+                'patient_name' => $patient->name,
+                'patient_phone' => $patient->phone,
+                'patient_email' => $patient->email,
+            ]);
+            
+            // Update appointment status
+            $appointment->update(['status' => 'booked']);
 
             return redirect()->route('patient.appointments')
                 ->with('success', 'Appointment booked successfully!');
@@ -87,46 +107,50 @@ class PatientController extends Controller
         return redirect()->back()->with('error', 'Unable to book appointment.');
     }
 
-    public function cancelAppointment(Request $request, Appointment $appointment)
+    public function cancelAppointment(Request $request, $patientAppointmentId)
     {
-        if ($appointment->patient_id !== auth()->id()) {
-            abort(403);
-        }
+        $patientAppointment = PatientAppointment::where('id', $patientAppointmentId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-        $appointment->update([
-            'status' => 'cancelled',
-            'availability' => true,
-            'patient_id' => null
-        ]);
+        // Update patient appointment status
+        $patientAppointment->update(['status' => 'cancelled']);
+        
+        // Make the appointment available again
+        $patientAppointment->appointment->update(['status' => 'available']);
 
         return redirect()->route('patient.appointments')
             ->with('success', 'Appointment cancelled successfully!');
     }
 
-    public function rescheduleAppointment(Request $request, Appointment $appointment)
+    public function rescheduleAppointment(Request $request, $patientAppointmentId)
     {
-        if ($appointment->patient_id !== auth()->id()) {
-            abort(403);
-        }
+        $patientAppointment = PatientAppointment::where('id', $patientAppointmentId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         $validated = $request->validate([
             'new_appointment_id' => 'required|exists:appointments,id'
         ]);
 
         // Cancel current appointment
-        $appointment->update([
-            'status' => 'cancelled',
-            'availability' => true,
-            'patient_id' => null
-        ]);
+        $patientAppointment->update(['status' => 'cancelled']);
+        $patientAppointment->appointment->update(['status' => 'available']);
 
-        // Book new appointment
+        // Create new patient appointment
         $newAppointment = Appointment::find($validated['new_appointment_id']);
-        $newAppointment->update([
-            'patient_id' => auth()->id(),
-            'availability' => false,
-            'status' => 'booked'
+        PatientAppointment::create([
+            'user_id' => auth()->id(),
+            'doctor_id' => $newAppointment->doctor_id,
+            'appointment_id' => $newAppointment->id,
+            'status' => 'pending',
+            'patient_name' => auth()->user()->name,
+            'patient_phone' => auth()->user()->phone,
+            'patient_email' => auth()->user()->email,
         ]);
+        
+        // Update appointment status
+        $newAppointment->update(['status' => 'booked']);
 
         return redirect()->route('patient.appointments')
             ->with('success', 'Appointment rescheduled successfully!');
@@ -176,7 +200,7 @@ class PatientController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('dashboard.patient.index')
+        return redirect()->route('patient.dashboard')
             ->with('success', 'Password updated successfully!');
     }
 

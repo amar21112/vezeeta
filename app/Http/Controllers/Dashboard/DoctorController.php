@@ -11,32 +11,32 @@ class   DoctorController extends Controller
     public function profile(){
         $doctor = auth('doctor')->user()->load(['specialties', 'appointments']);
         
-        // Calculate dashboard statistics - using availability to determine if appointment is booked
+        // Calculate dashboard statistics - using status to determine if appointment is booked
         $totalPatients = $doctor->appointments()
-            ->where('availability', false)
+            ->where('status', 'booked')
             ->count(); // Approximating unique patients
             
         $todayAppointments = $doctor->appointments()
-            ->whereDate('appointment_date', today())
-            ->where('availability', false)
+            ->whereDate('date', today())
+            ->where('status', 'booked')
             ->count();
             
         $monthlyRevenue = $doctor->appointments()
-            ->whereMonth('appointment_date', now()->month)
-            ->whereYear('appointment_date', now()->year)
-            ->where('availability', false)
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->where('status', 'booked')
             ->sum('price');
             
         $recentAppointments = $doctor->appointments()
-            ->where('availability', false)
-            ->orderBy('appointment_date', 'desc')
+            ->where('status', 'booked')
+            ->orderBy('date', 'desc')
             ->take(5)
             ->get();
             
         $todayAppointmentsList = $doctor->appointments()
-            ->whereDate('appointment_date', today())
-            ->where('availability', false)
-            ->orderBy('appointment_date', 'asc')
+            ->whereDate('date', today())
+            ->where('status', 'booked')
+            ->orderBy('date', 'asc')
             ->get();
 
         return view('doctor.dashboard.profile', compact(
@@ -72,19 +72,19 @@ class   DoctorController extends Controller
 
     public function doctorAppointments(){
         $doctor = auth('doctor')->user();
-        $appointments = $doctor->appointments()->orderBy('appointment_date', 'desc')->get();
+        $appointments = $doctor->appointments()->orderBy('date', 'desc')->get();
         
-        // Calculate statistics - using availability to determine if appointment is booked
-        $availableSlots = $doctor->appointments()->where('availability', true)->count();
+        // Calculate statistics - using status to determine if appointment is booked
+        $availableSlots = $doctor->appointments()->where('status', 'available')->count();
         $bookedToday = $doctor->appointments()
-            ->whereDate('appointment_date', today())
-            ->where('availability', false)
+            ->whereDate('date', today())
+            ->where('status', 'booked')
             ->count();
         $thisWeekCount = $doctor->appointments()
-            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])
             ->count();
         $totalRevenue = $doctor->appointments()
-            ->where('availability', false)
+            ->where('status', 'booked')
             ->sum('price');
         
         return view('doctor.dashboard.appointments', compact(
@@ -108,9 +108,11 @@ class   DoctorController extends Controller
         ]);
         if($validated){
             foreach ($validated['appointments'] as $dateTime) {
+                $dateTimeObj = new \DateTime($dateTime);
                 $doctor->appointments()->create([
-                    'appointment_date' => $dateTime,
-                    'price'     => $validated['price'],
+                    'date' => $dateTimeObj->format('Y-m-d'),
+                    'time' => $dateTimeObj->format('H:i:s'),
+                    'price' => $validated['price'],
                 ]);
             }
             return redirect()->route('doctor.appointments')->with(['success' => 'Appointment added successfully']);

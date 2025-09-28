@@ -1,28 +1,23 @@
-@include('doctors-data')
 @php
-    // Include centralized doctors data
-
-    // Get doctor ID from URL parameter
-    $doctorId = (int) ($_GET['doctor_id'] ?? 1);
-
-    // First, try to get doctor from our data
-    $doctor = getDoctorById($doctorId);
-
-    // If not found, simulate API call
-    if (!$doctor) {
-        $apiResponse = fetchDoctorData($doctorId);
-        if ($apiResponse['success']) {
-            $doctor = $apiResponse['data'];
-        } else {
-            // Fallback to first doctor if not found
-            $allDoctors = getAllDoctors();
-            $doctor = reset($allDoctors);
-
-            // Log error or show message
-            $errorMessage = "Doctor with ID {$doctorId} not found. Showing default doctor.";
-        }
-    }
-    $page_title = htmlspecialchars($doctor['title'] . ' ' . $doctor['name'] . ' - Vezeeta');
+    // Use database doctor data instead of static array
+    $doctorData = [
+        'id' => $doctor->id,
+        'title' => 'Doctor',
+        'name' => $doctor->name . ' ' . $doctor->surname,
+        'image' => $doctor->image ?? 'https://via.placeholder.com/400x400/3B82F6/FFFFFF?text=' . substr($doctor->name, 0, 1),
+        'specialty' => $doctor->specialties->first()->special_name ?? 'General Practice',
+        'specialties' => $doctor->specialties->pluck('special_name')->toArray(),
+        'rating' => $doctor->rating ?? 4.0,
+        'reviews_count' => $doctor->reviews_count ?? 0,
+        'location' => ($doctor->governorate ?? '') . ($doctor->city ? ' - ' . $doctor->city : ''),
+        'fees' => $doctor->fees ?? 200,
+        'waiting_time' => $doctor->waiting_time ?? 15,
+        'about' => $doctor->about ?? 'Experienced medical professional dedicated to providing quality healthcare services.',
+        'symptoms_services' => explode(',', $doctor->services ?? 'General Consultation,Health Check-up,Medical Advice,Treatment Planning'),
+        'appointments' => $doctor->appointments->toArray() ?? [], // Convert to array for appointment-slots component
+    ];
+    
+    $page_title = htmlspecialchars($doctorData['title'] . ' ' . $doctorData['name'] . ' - Vezeeta');
 @endphp
 
 @extends('layouts.app')
@@ -34,26 +29,14 @@
             <nav class="flex items-center space-x-2 text-sm">
                 <a href="/" class="text-blue-600 hover:underline">Vezeeta</a>
                 <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                <a href="doctors.php" class="text-blue-600 hover:underline">Find Doctors</a>
+                <a href="{{ route('doctors.page') }}" class="text-blue-600 hover:underline">Find Doctors</a>
                 <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                <span class="text-gray-600"><?php echo htmlspecialchars($doctor['title'] . ' ' . $doctor['name']); ?></span>
+                <span class="text-gray-600">{{ htmlspecialchars($doctorData['title'] . ' ' . $doctorData['name']) }}</span>
             </nav>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 py-6">
-        <?php if (isset($errorMessage)): ?>
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm"><?php echo htmlspecialchars($errorMessage); ?></p>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
 
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- Main Content -->
@@ -61,37 +44,39 @@
                 <!-- Doctor Profile Header -->
                 <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
                     <div class="flex items-start space-x-4">
-                        <img src="<?php echo htmlspecialchars($doctor['image']); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>"
+                        <img src="{{ htmlspecialchars($doctorData['image']) }}" alt="{{ htmlspecialchars($doctorData['name']) }}"
                             class="w-24 h-24 rounded-full object-cover border-2 border-gray-200">
                         <div class="flex-1">
                             <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                                <?php echo htmlspecialchars($doctor['title'] . ' ' . $doctor['name']); ?>
+                                {{ htmlspecialchars($doctorData['title'] . ' ' . $doctorData['name']) }}
                             </h1>
-                            <p class="text-gray-600 mb-3"><?php echo htmlspecialchars($doctor['specialty']); ?></p>
+                            <p class="text-gray-600 mb-3">{{ htmlspecialchars($doctorData['specialty']) }}</p>
 
                             <!-- Specialties -->
                             <div class="mb-3">
-                                <span class="text-blue-600 font-medium">Dermatologist</span>
-                                <span class="text-gray-600 ml-1">Specialized in</span>
-                                <span class="text-blue-600 ml-1">
-                                    <?php echo htmlspecialchars(implode(', ', $doctor['specialties'])); ?>
-                                </span>
-                                <button class="text-blue-600 ml-2 hover:underline">... More</button>
+                                <span class="text-blue-600 font-medium">{{ ucfirst(strtolower($doctorData['specialty'])) }}</span>
+                                @if (!empty($doctorData['specialties']))
+                                    <span class="text-gray-600 ml-1">Specialized in</span>
+                                    <span class="text-blue-600 ml-1">
+                                        {{ implode(', ', $doctorData['specialties']) }}
+                                    </span>
+                                    <button class="text-blue-600 ml-2 hover:underline">... More</button>
+                                @endif
                             </div>
 
                             <!-- Rating -->
                             <div class="flex items-center">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <?php  if ($i <= floor($doctor['rating'])): ?>
-                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                <?php  elseif ($i == ceil($doctor['rating']) && $doctor['rating'] - floor($doctor['rating']) >= 0.5): ?>
-                                <i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>
-                                <?php  else: ?>
-                                <i class="fas fa-star text-gray-300 text-sm"></i>
-                                <?php  endif; ?>
-                                <?php endfor; ?>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= floor($doctorData['rating']))
+                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    @elseif ($i == ceil($doctorData['rating']) && $doctorData['rating'] - floor($doctorData['rating']) >= 0.5)
+                                        <i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>
+                                    @else
+                                        <i class="fas fa-star text-gray-300 text-sm"></i>
+                                    @endif
+                                @endfor
                                 <span class="ml-2 text-sm text-gray-600">
-                                    Overall Rating From <?php echo $doctor['reviews_count']; ?> Visitors
+                                    Overall Rating From {{ $doctorData['reviews_count'] }} Visitors
                                 </span>
                                 <button class="text-blue-600 ml-2 hover:underline text-sm">Show all reviews</button>
                             </div>
@@ -106,7 +91,7 @@
                         <h2 class="text-xl font-semibold text-gray-900">About The Doctor</h2>
                     </div>
                     <p class="text-gray-700 leading-relaxed">
-                        <?php echo nl2br(htmlspecialchars($doctor['about'])); ?>
+                        {{ $doctorData['about'] }}
                     </p>
                 </div>
 
@@ -117,13 +102,13 @@
                         <h2 class="text-xl font-semibold text-gray-900">Symptoms and Services :</h2>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <?php foreach ($doctor['symptoms_services'] as $service): ?>
-                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200">
-                            <?php echo htmlspecialchars($service); ?>
-                        </span>
-                        <?php endforeach; ?>
+                        @foreach ($doctorData['symptoms_services'] as $service)
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200">
+                                {{ htmlspecialchars($service) }}
+                            </span>
+                        @endforeach
                         <button class="px-3 py-1 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700">
-                            + 15
+                            + {{ count($doctorData['symptoms_services']) > 4 ? count($doctorData['symptoms_services']) - 4 : 0 }}
                         </button>
                     </div>
                 </div>
@@ -187,11 +172,11 @@
                         <div class="flex items-center">
                             <i class="fas fa-money-bill-wave text-blue-600 mr-2"></i>
                             <span class="text-sm text-gray-600">Fees</span>
-                            <span class="font-bold text-lg ml-2"><?php echo $doctor['fees']; ?> EGP</span>
+                            <span class="font-bold text-lg ml-2">{{ $doctorData['fees'] }} EGP</span>
                         </div>
                         <div class="flex items-center text-green-600">
                             <i class="fas fa-clock mr-1"></i>
-                            <span class="text-sm font-medium">Waiting Time : <?php echo $doctor['waiting_time']; ?> Minutes</span>
+                            <span class="text-sm font-medium">Waiting Time : {{ $doctorData['waiting_time'] }} Minutes</span>
                         </div>
                     </div>
 
@@ -199,7 +184,7 @@
                     <div class="mb-6">
                         <div class="flex items-center mb-2">
                             <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>
-                            <span class="text-gray-600"><?php echo htmlspecialchars($doctor['location']); ?></span>
+                            <span class="text-gray-600">{{ htmlspecialchars($doctorData['location']) }}</span>
                         </div>
                         <div class="text-sm text-gray-500">
                             <i class="fas fa-info-circle mr-1"></i>
@@ -212,11 +197,11 @@
                         <h4 class="text-center text-gray-800 font-semibold mb-4">Choose your appointment</h4>
 
                         <!-- Include Appointment Slots Component -->
-                        <?php
-                        $componentId = 'doctor_profile_' . $doctor['id'];
-                        ?>
+                        @php
+                            $componentId = 'doctor_profile_' . $doctorData['id'];
+                        @endphp
                         @include('components.appointment-slots', [
-                            'doctor' => $doctor,
+                            'doctor' => $doctorData,
                             'componentId' => $componentId,
                         ])
                     </div>

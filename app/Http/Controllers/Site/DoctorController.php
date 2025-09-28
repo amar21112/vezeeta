@@ -28,7 +28,7 @@ class DoctorController extends Controller
 
         // Start building the query
         $doctorsQuery = Doctor::with(['specialties'])
-            ->where('status', 'active'); // Only active doctors
+            ->where('is_active', true); // Only active doctors
 
         // Filter by specialty
         if ($request->filled('specialty')) {
@@ -114,7 +114,7 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::with(['specialties', 'appointments'])
             ->where('id', $id)
-            ->where('status', 'active')
+            ->where('is_active', true)
             ->firstOrFail();
 
         return view('site.doctors.show', compact('doctor'));
@@ -134,31 +134,31 @@ class DoctorController extends Controller
         
         $appointmentsQuery = $doctor->appointments()
             ->where('status', 'available')
-            ->where('appointment_date', '>=', now());
+            ->where('date', '>=', now()->toDateString());
 
         if ($request->filled('date')) {
-            $appointmentsQuery->whereDate('appointment_date', $request->date);
+            $appointmentsQuery->whereDate('date', $request->date);
         }
 
         if ($request->filled('time_range')) {
             $timeRange = $request->time_range;
             switch ($timeRange) {
                 case 'morning':
-                    $appointmentsQuery->whereTime('appointment_time', '>=', '06:00')
-                        ->whereTime('appointment_time', '<', '12:00');
+                    $appointmentsQuery->whereTime('time', '>=', '06:00')
+                        ->whereTime('time', '<', '12:00');
                     break;
                 case 'afternoon':
-                    $appointmentsQuery->whereTime('appointment_time', '>=', '12:00')
-                        ->whereTime('appointment_time', '<', '18:00');
+                    $appointmentsQuery->whereTime('time', '>=', '12:00')
+                        ->whereTime('time', '<', '18:00');
                     break;
                 case 'evening':
-                    $appointmentsQuery->whereTime('appointment_time', '>=', '18:00');
+                    $appointmentsQuery->whereTime('time', '>=', '18:00');
                     break;
             }
         }
 
-        $appointments = $appointmentsQuery->orderBy('appointment_date')
-            ->orderBy('appointment_time')
+        $appointments = $appointmentsQuery->orderBy('date')
+            ->orderBy('time')
             ->get();
 
         return response()->json([

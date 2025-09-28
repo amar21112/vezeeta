@@ -36,22 +36,55 @@ Route::get('/forgot-password', function () {
     return view('user.auth.forgot-password');
 })->name('user.forgot-password');
 
-Route::get('/doctors', function () {
-    return view('doctors');
+// Doctors page route is defined below with controller
+
+// Doctor profile route is defined below with controller
+
+// Reservation routes
+Route::get('/create-reservation', [MainController::class, 'showCreateReservation'])->name('reservation.create');
+Route::post('/create-reservation', [MainController::class, 'storeReservation'])->middleware('auth:web')->name('reservation.book');
+Route::get('/reservation-success/{id}', [MainController::class, 'reservationSuccess'])->middleware('auth:web')->name('reservation.success');
+
+// API Routes for Home Page Search Functionality
+Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
+    // Get all specialties for search dropdown
+    Route::get('specialties', [MainController::class, 'getSpecialties'])->name('specialties');
+    
+    // Get all cities/governorates for search dropdown
+    Route::get('cities', [MainController::class, 'getCities'])->name('cities');
+    
+    // Search doctors with filters
+    Route::get('doctors/search', [MainController::class, 'searchDoctors'])->name('doctors.search');
+    
+    // Get all doctors
+    Route::get('doctors', [MainController::class, 'getAllDoctors'])->name('doctors.all');
+    
+    // Get specific doctor
+    Route::get('doctors/{id}', [MainController::class, 'getDoctor'])->name('doctors.show');
+    
+    // Get appointments for a specific doctor
+    Route::get('doctors/{id}/appointments', [MainController::class, 'getDoctorAppointments'])->name('doctors.appointments');
 });
 
-
-
-Route::get('/create-reservation', function () {
-    return view('create-reservation');
+// Test route for API endpoints
+Route::get('/test-api', function() {
+    return response()->json([
+        'message' => 'API endpoints are working!',
+        'endpoints' => [
+            'GET /api/specialties - Get all specialties',
+            'GET /api/cities - Get all cities',
+            'GET /api/doctors/search - Search doctors',
+            'GET /api/doctors - Get all doctors',
+            'GET /api/doctors/{id} - Get specific doctor',
+            'GET /api/doctors/{id}/appointments - Get doctor appointments'
+        ]
+    ]);
 });
 
-// Doctor search routes
-Route::get('/doctors', [App\Http\Controllers\Site\DoctorController::class, 'search'])->name('doctors.search');
-Route::get('/doctor/{id}', [App\Http\Controllers\Site\DoctorController::class, 'show'])->name('doctor.show');
-Route::get('/api/doctors/{id}/appointments', [App\Http\Controllers\Site\DoctorController::class, 'getAppointments'])->name('doctor.appointments');
-Route::get('/api/specialists', [App\Http\Controllers\Site\DoctorController::class, 'getSpecialists'])->name('api.specialists');
-Route::get('/api/governorates', [App\Http\Controllers\Site\DoctorController::class, 'getGovernorates'])->name('api.governorates');
+// Enhanced Main site routes
+Route::get('/doctors', [MainController::class, 'doctorsPage'])->name('doctors.page');
+Route::get('/doctors/search', [MainController::class, 'doctorsPage'])->name('doctors.search');
+Route::get('/doctor/{id}', [MainController::class, 'doctorProfile'])->name('doctor.profile');
 
 //User auth
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
@@ -162,8 +195,8 @@ Route::middleware('auth:web')->prefix('dashboard/patient')->name('patient.')->gr
     Route::get('appointments', [PatientController::class, 'appointments'])->name('appointments');
     Route::get('appointments/history', [PatientController::class, 'appointmentHistory'])->name('appointments.history');
     Route::post('appointments/book', [PatientController::class, 'bookAppointment'])->name('appointments.book');
-    Route::put('appointments/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointments.cancel');
-    Route::put('appointments/{appointment}/reschedule', [PatientController::class, 'rescheduleAppointment'])->name('appointments.reschedule');
+    Route::put('appointments/{patientAppointmentId}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointments.cancel');
+    Route::put('appointments/{patientAppointmentId}/reschedule', [PatientController::class, 'rescheduleAppointment'])->name('appointments.reschedule');
     
     // Medical Records
     Route::get('medical-records', [PatientController::class, 'medicalRecords'])->name('medical-records');

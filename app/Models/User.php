@@ -41,12 +41,13 @@ class User extends Authenticatable
     ];
 
 
-    public function appointments(){
-        return $this->hasMany(Appointment::class);
-    }
-
     public function patientAppointments(){
         return $this->hasMany(PatientAppointment::class, 'user_id');
+    }
+    
+    // Get appointments through the patient_appointments pivot table
+    public function appointments(){
+        return $this->hasManyThrough(Appointment::class, PatientAppointment::class, 'user_id', 'id', 'id', 'appointment_id');
     }
 
 }

@@ -22,21 +22,21 @@ class PatientAppointmentSeeder extends Seeder
             User::create([
                 'name' => 'John Doe',
                 'email' => 'john@example.com',
-                'phone' => '1234567890',
+                'phone' => '12345678900',
                 'password' => bcrypt('password'),
             ]);
             
             User::create([
                 'name' => 'Jane Smith',
                 'email' => 'jane@example.com',
-                'phone' => '1234567891',
+                'phone' => '12345678901',
                 'password' => bcrypt('password'),
             ]);
             
             User::create([
                 'name' => 'Mike Johnson',
                 'email' => 'mike@example.com',
-                'phone' => '1234567892',
+                'phone' => '12345678902',
                 'password' => bcrypt('password'),
             ]);
         }
@@ -47,7 +47,7 @@ class PatientAppointmentSeeder extends Seeder
                 'name' => 'Dr. Sarah',
                 'surname' => 'Wilson',
                 'email' => 'sarah@vezeeta.com',
-                'phone' => '1234567893',
+                'phone' => '12345678903',
                 'password' => bcrypt('password'),
                 'graduate_from' => 'Medical University',
                 'graduate_in' => 2015,
@@ -62,7 +62,7 @@ class PatientAppointmentSeeder extends Seeder
                 'name' => 'Dr. Ahmed',
                 'surname' => 'Hassan',
                 'email' => 'ahmed@vezeeta.com',
-                'phone' => '1234567894',
+                'phone' => '12345678904',
                 'password' => bcrypt('password'),
                 'graduate_from' => 'Cairo University',
                 'graduate_in' => 2018,

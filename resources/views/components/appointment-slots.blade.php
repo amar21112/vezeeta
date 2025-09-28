@@ -21,45 +21,116 @@ $currentOffset = (int)($_GET['offset_' . $componentId] ?? 0);
 $expandedDay = $_GET['expanded_' . $componentId] ?? '';
 
 /**
- * Process appointments data from the doctor array to match the expected structure
+ * Process appointments data from database to match the expected structure
  */
 if (!function_exists('processAppointmentsData')) {
   function processAppointmentsData($appointments)
   {
     $processedData = [];
-
-    foreach ($appointments as $dateKey => $slots) {
-      // Parse the date
-      $date = DateTime::createFromFormat('d/m/Y', $dateKey);
-      if (!$date) {
-        continue;
-      }
-
-      // Determine day title
-      $today = new DateTime();
-      $tomorrow = (clone $today)->add(new DateInterval('P1D'));
-
-      if ($date->format('Y-m-d') === $today->format('Y-m-d')) {
-        $title = 'Today';
-      } elseif ($date->format('Y-m-d') === $tomorrow->format('Y-m-d')) {
-        $title = 'Tomorrow';
-      } else {
-        $title = $date->format('D m/d');
-      }
-
-      // Split slots into visible and more slots (first 4 visible, rest in "more")
-      $visibleSlots = array_slice($slots, 0, 4);
-      $moreSlots = array_slice($slots, 4);
-
-      $processedData[] = [
-        'key' => $dateKey,
-        'title' => $title,
-        'date' => $date->format('Y-m-d'),
-        'slots' => $visibleSlots,
-        'moreSlots' => $moreSlots,
-        'hasMore' => count($moreSlots) > 0
-      ];
+    
+    // Handle both array format (static data) and Laravel Collection (database data)
+    if (is_object($appointments) && method_exists($appointments, 'toArray')) {
+      // Convert Laravel Collection to array
+      $appointments = $appointments->toArray();
     }
+    
+    // Check if appointments is in old format (associative array with date keys) or new format (indexed array from DB)
+    if (!empty($appointments) && !is_numeric(array_keys($appointments)[0])) {
+      // Old format: associative array with date keys like 'd/m/Y'
+      foreach ($appointments as $dateKey => $slots) {
+        $date = DateTime::createFromFormat('d/m/Y', $dateKey);
+        if (!$date) {
+          continue;
+        }
+
+        $today = new DateTime();
+        $tomorrow = (clone $today)->add(new DateInterval('P1D'));
+
+        if ($date->format('Y-m-d') === $today->format('Y-m-d')) {
+          $title = 'Today';
+        } elseif ($date->format('Y-m-d') === $tomorrow->format('Y-m-d')) {
+          $title = 'Tomorrow';
+        } else {
+          $title = $date->format('D m/d');
+        }
+
+        $visibleSlots = array_slice($slots, 0, 4);
+        $moreSlots = array_slice($slots, 4);
+
+        $processedData[] = [
+          'key' => $dateKey,
+          'title' => $title,
+          'date' => $date->format('Y-m-d'),
+          'slots' => $visibleSlots,
+          'moreSlots' => $moreSlots,
+          'hasMore' => count($moreSlots) > 0
+        ];
+      }
+    } else {
+      // New format: indexed array from database with date/time/status fields
+      $appointmentsByDate = [];
+      
+      foreach ($appointments as $appointment) {
+        $date = $appointment['date'] ?? null;
+        $time = $appointment['time'] ?? null;
+        $status = $appointment['status'] ?? 'available';
+        
+        if (!$date || !$time) {
+          continue;
+        }
+        
+        // Group appointments by date
+        if (!isset($appointmentsByDate[$date])) {
+          $appointmentsByDate[$date] = [];
+        }
+        
+        $appointmentsByDate[$date][] = [
+          'time' => date('g:i A', strtotime($time)),
+          'available' => ($status === 'available')
+        ];
+      }
+      
+      // Process grouped appointments
+      foreach ($appointmentsByDate as $dateStr => $slots) {
+        $date = DateTime::createFromFormat('Y-m-d', $dateStr);
+        if (!$date) {
+          continue;
+        }
+
+        $today = new DateTime();
+        $tomorrow = (clone $today)->add(new DateInterval('P1D'));
+
+        if ($date->format('Y-m-d') === $today->format('Y-m-d')) {
+          $title = 'Today';
+        } elseif ($date->format('Y-m-d') === $tomorrow->format('Y-m-d')) {
+          $title = 'Tomorrow';
+        } else {
+          $title = $date->format('D m/d');
+        }
+
+        // Sort slots by time
+        usort($slots, function($a, $b) {
+          return strtotime($a['time']) - strtotime($b['time']);
+        });
+
+        $visibleSlots = array_slice($slots, 0, 4);
+        $moreSlots = array_slice($slots, 4);
+
+        $processedData[] = [
+          'key' => $date->format('d/m/Y'), // Convert to old format for compatibility
+          'title' => $title,
+          'date' => $date->format('Y-m-d'),
+          'slots' => $visibleSlots,
+          'moreSlots' => $moreSlots,
+          'hasMore' => count($moreSlots) > 0
+        ];
+      }
+    }
+
+    // Sort by date
+    usort($processedData, function($a, $b) {
+      return strtotime($a['date']) - strtotime($b['date']);
+    });
 
     return $processedData;
   }
@@ -75,14 +146,15 @@ $maxOffset = max(0, $totalDays - $daysPerPage);
 $currentOffset = max(0, min($currentOffset, $maxOffset));
 $visibleDays = array_slice($appointmentData, $currentOffset, $daysPerPage);
 
-// Build navigation URLs
+// Build navigation URLs - Use current URL instead of PHP_SELF for Laravel compatibility
 $currentParams = $_GET;
 $prevParams = array_merge($currentParams, ['offset_' . $componentId => max(0, $currentOffset - 1)]);
 $nextParams = array_merge($currentParams, ['offset_' . $componentId => min($maxOffset, $currentOffset + 1)]);
 
-$baseUrl = $_SERVER['PHP_SELF'];
-$prevUrl = $baseUrl . '?' . http_build_query($prevParams);
-$nextUrl = $baseUrl . '?' . http_build_query($nextParams);
+// Get current URL without query parameters
+$currentUrl = strtok($_SERVER["REQUEST_URI"], '?');
+$prevUrl = $currentUrl . '?' . http_build_query($prevParams);
+$nextUrl = $currentUrl . '?' . http_build_query($nextParams);
 @endphp
 
 <!-- Appointment Slots Component -->
@@ -497,7 +569,7 @@ $nextUrl = $baseUrl . '?' . http_build_query($nextParams);
           // Add selection to clicked slot
           this.classList.add('selected');
 
-          // Build URL and redirect
+          // Build URL and redirect to Laravel route
           const params = new URLSearchParams({
             doctor_id: this.dataset.doctorId,
             date: this.dataset.date,
@@ -506,7 +578,7 @@ $nextUrl = $baseUrl . '?' . http_build_query($nextParams);
             // doctor_specialty: this.dataset.doctorSpecialty
           });
 
-          window.location.href = 'create-reservation?' + params.toString();
+          window.location.href = '{{ url("/create-reservation") }}?' + params.toString();
         };
       });
 

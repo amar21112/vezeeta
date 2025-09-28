@@ -58,7 +58,7 @@
     <a href="#" class="text-primary font-weight-bold">All Offers &gt;</a>
   </div>
   <div id="offersCarousel" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner flex">
+    <div class="carousel-inner flex justify-center">
 
 
       <div class="carousel-item active">
@@ -128,7 +128,7 @@
 <!-- Top Specialties -->
 <div class="container my-5">
   <h4 class="mb-4">Book from top specialties</h4>
-  <div class="flex gap-2">
+  <div class="flex justify-center gap-2">
     <div class="col-md-3 mb-3">
       <div class="specialty-card">
         <img src="https://assets.clevelandclinic.org/transform/78ec4257-9fdf-4be0-9f97-a53263613bdb/CC_HE_1248172109_ClearSkin_jpg" alt="Skin">
