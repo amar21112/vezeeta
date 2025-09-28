@@ -15,6 +15,10 @@
                     auth()->user()->avatar ??
                     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                 $current_page = 'appointments';
+                $appointments_count = auth()->user()->appointments ? auth()->user()->appointments->count() : 0;
+                $completed_appointments = auth()->user()->appointments
+                    ? auth()->user()->appointments->where('status', 'completed')->count()
+                    : 0;
             @endphp
             @include('components.patient-sidebar', [
                 'patient_name' => $patient_name,
@@ -62,11 +66,11 @@
                                                     <div class="flex items-center space-x-4 mt-2">
                                                         <span class="flex items-center text-sm text-gray-500">
                                                             <i class="fas fa-calendar mr-1"></i>
-                                                            {{ $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') : 'Date TBD' }}
+                                                            {{ $appointment->appointment->date ? \Carbon\Carbon::parse($appointment->appointment->date)->format('M j, Y') : 'Date TBD' }}
                                                         </span>
                                                         <span class="flex items-center text-sm text-gray-500">
                                                             <i class="fas fa-clock mr-1"></i>
-                                                            {{ $appointment->appointment_time ?? 'Time TBD' }}
+                                                            {{ $appointment->appointment->time ?? 'Time TBD' }}
                                                         </span>
                                                     </div>
                                                 </div>

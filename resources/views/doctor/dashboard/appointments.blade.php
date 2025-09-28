@@ -80,7 +80,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p class="text-2xl font-bold text-orange-600">₪{{ number_format($totalRevenue ?? 0) }}</p>
+                    <p class="text-2xl font-bold text-orange-600">${{ number_format($totalRevenue ?? 0) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                     <i class="fas fa-dollar-sign text-orange-600"></i>
@@ -118,10 +118,10 @@
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ date('M d, Y', strtotime($appointment->appointment_date)) }}
+                                                {{ date('M d, Y', strtotime($appointment->date)) }}
                                             </div>
                                             <div class="text-sm text-gray-500">
-                                                {{ date('g:i A', strtotime($appointment->appointment_date)) }}
+                                                {{ date('g:i A', strtotime($appointment->time)) }}
                                             </div>
                                         </div>
                                     </div>
@@ -153,7 +153,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if(!$appointment->availability)
-                                        @if(now()->isAfter($appointment->appointment_date))
+                                        @if(now()->isAfter($appointment->date))
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                 Completed
                                             </span>

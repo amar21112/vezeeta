@@ -41,7 +41,7 @@
                         @foreach($doctor->specialties as $specialty)
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
                                 <i class="fas fa-check mr-2"></i>
-                                {{ $specialty->name }}
+                                {{ $specialty->special_name }}
                             </span>
                         @endforeach
                     </div>
@@ -116,7 +116,7 @@
                                 $checked = $isSelected || $oldSelected;
                             @endphp
                             
-                            <div class="specialty-item border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-200 {{ $checked ? 'bg-emerald-50 border-emerald-300' : 'hover:bg-gray-50' }}" data-name="{{ strtolower($speciality->name) }}">
+                            <div class="specialty-item border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-200 {{ $checked ? 'bg-emerald-50 border-emerald-300' : 'hover:bg-gray-50' }}" data-name="{{ strtolower($speciality->special_name) }}">
                                 <label class="flex items-start space-x-3 cursor-pointer">
                                     <input type="checkbox" 
                                            name="specialities[]" 
@@ -131,7 +131,7 @@
                                                 <i class="fas fa-user-md text-emerald-600"></i>
                                             </div>
                                             <div class="flex-1">
-                                                <h4 class="font-semibold text-gray-900 text-sm">{{ $speciality->name }}</h4>
+                                                <h4 class="font-semibold text-gray-900 text-sm">{{ $speciality->special_name }}</h4>
                                                 @if($speciality->description)
                                                     <p class="text-xs text-gray-500 mt-1">{{ Str::limit($speciality->description, 60) }}</p>
                                                 @endif
@@ -213,7 +213,7 @@
                     <button type="button" 
                             onclick="toggleSpecialtyById({{ $speciality->id }})" 
                             class="px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-colors text-sm">
-                        {{ $speciality->name }}
+                        {{ $speciality->special_name }}
                     </button>
                 @endforeach
             </div>

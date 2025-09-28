@@ -121,13 +121,13 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="user-avatar me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">
-                                                    {{ substr($appointment->patient->name, 0, 1) }}
+                                                    {{ substr($appointment->patient->name ?? 'Patient', 0, 1) }}
                                                 </div>
-                                                {{ $appointment->patient->name }}
+                                                {{ $appointment->patient->name ?? 'Patient' }}
                                             </div>
                                         </td>
-                                        <td>Dr. {{ $appointment->appointment->doctor->name }}</td>
-                                        <td>{{ $appointment->appointment->date }}</td>
+                                        <td>Dr. {{ $appointment->doctor->name ?? 'Doctor' }}</td>
+                                        <td>{{ $appointment->date ?? 'Date' }}</td>
                                         <td>
                                             <span class="status-badge status-{{ $appointment->status }}">
                                                 {{ ucfirst($appointment->status) }}

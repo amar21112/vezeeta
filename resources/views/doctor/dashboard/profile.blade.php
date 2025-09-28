@@ -96,15 +96,18 @@
                                         <i class="fas fa-user text-emerald-600"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900">{{ $appointment->patient->name ?? 'Patient' }}</p>
-                                        <p class="text-sm text-gray-500">{{ $appointment->appointment_date ?? 'Date' }}</p>
+                                        {{-- <pre>
+                                            {{ var_dump($appointment) }}
+                                        </pre> --}}
+                                        <p class="font-medium text-gray-900">{{ $appointment->user_id ?? 'Patient' }}</p>
+                                        <p class="text-sm text-gray-500">{{ $appointment->date ?? 'Date' }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                                         Scheduled
                                     </span>
-                                    <span class="text-sm font-medium text-gray-900">₪{{ $appointment->price ?? 0 }}</span>
+                                    <span class="text-sm font-medium text-gray-900">${{ $appointment->price ?? 0 }}</span>
                                 </div>
                             </div>
                         @endforeach
@@ -190,7 +193,7 @@
                             <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                                 <div>
                                     <p class="font-medium text-gray-900 text-sm">{{ $appointment->patient->name ?? 'Patient' }}</p>
-                                    <p class="text-xs text-gray-500">{{ date('g:i A', strtotime($appointment->appointment_date)) }}</p>
+                                    <p class="text-xs text-gray-500">{{ date('g:i A', strtotime($appointment->appointment->date)) }}</p>
                                 </div>
                                 <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                                     <i class="fas fa-clock text-blue-600 text-xs"></i>

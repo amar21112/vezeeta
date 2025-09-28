@@ -47,8 +47,8 @@ class PatientController extends Controller
         ]);
         
         $user->update($validated);
-        
-        return redirect()->route('patient.dashboard')
+
+        return redirect()->route('dashboard.patient.index')
                         ->with('success', 'Profile updated successfully!');
     }
 
@@ -200,7 +200,7 @@ class PatientController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('patient.dashboard')
+        return redirect()->route('dashboard.patient.index')
             ->with('success', 'Password updated successfully!');
     }
 

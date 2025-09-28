@@ -11,8 +11,8 @@
     $patient_avatar =
         $patient_avatar ??
         'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-    $appointments_count = $appointments_count ?? 12;
-    $completed_appointments = $completed_appointments ?? 8;
+    $appointments_count = $appointments_count ?? 0;
+    $completed_appointments = $completed_appointments ?? 0;
     $current_page = $current_page ?? 'profile'; // profile, password, insurance, appointments, records, notifications
 
     // Navigation menu items

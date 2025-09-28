@@ -85,11 +85,11 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="user-avatar me-3">
-                                                    {{ substr($appointment->patient->name, 0, 1) }}
+                                                    {{ substr($appointment->patient->name ?? 'Patient', 0, 1) }}
                                                 </div>
                                                 <div>
-                                                    <h6 class="mb-0">{{ $appointment->patient->name }}</h6>
-                                                    <small class="text-muted">{{ $appointment->patient->email }}</small>
+                                                    <h6 class="mb-0">{{ $appointment->patient->name ?? 'Patient' }}</h6>
+                                                    <small class="text-muted">{{ $appointment->patient->email ?? 'Email' }}</small>
                                                 </div>
                                             </div>
                                         </td>
